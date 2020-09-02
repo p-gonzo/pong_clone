@@ -1,0 +1,1 @@
+make all && ./pong && rm pong
