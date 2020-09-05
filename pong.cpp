@@ -1,5 +1,7 @@
-#include <SDL2/SDL.h>
 #include <iostream>
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "assets/Ball.h"
 #include "assets/Net.h"
@@ -15,6 +17,12 @@ int main( int argc, char* args[] )
         return -1;
     }
 
+    if ( TTF_Init() < 0 )
+    {
+        std::cout <<  "TTF could not initialize! TTF_Error: " << TTF_GetError() << std::endl;
+        return -1;
+    }
+
     SDL_Window* window = SDL_CreateWindow( "Pong", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, Constants::WindowWidth, Constants::WindowHeight, SDL_WINDOW_SHOWN );
     if( window == NULL )
     {
@@ -22,7 +30,9 @@ int main( int argc, char* args[] )
         return -1;
     }
 
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
+    SDL_Renderer* renderer { SDL_CreateRenderer( window, -1, 0 ) }; 
+
+    TTF_Font *scoreFont { TTF_OpenFont( "DejaVuSansMono.ttf", 40 ) };
 
     Ball ball( Vec2( Constants::WindowWidth / 2.0f - Constants::BallHeight / 2.0f, Constants::WindowHeight / 2.0f - Constants::BallHeight / 2.0f ), Constants::BallHeight );
     Paddle paddleOne( Vec2( Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ), Constants::PaddleHeight, Constants::PaddleWidth );
@@ -54,6 +64,8 @@ int main( int argc, char* args[] )
 
     SDL_DestroyRenderer( renderer );
     SDL_DestroyWindow( window );
+    TTF_CloseFont( scoreFont );
+    TTF_Quit();
     SDL_Quit();
 
     return 0;
