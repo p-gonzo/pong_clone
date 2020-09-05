@@ -10,6 +10,31 @@
 #include "assets/Vec2.h"
 #include "Constants.h"
 
+void drawAll( SDL_Renderer* renderer, Net &net, Ball &ball, Paddle &p1Paddle, Paddle &p2Paddle, PlayerScore &p1Score, PlayerScore &p2Score )
+{
+    SDL_SetRenderDrawColor( renderer, 0x0, 0x0, 0xFF, 0xFF );
+    SDL_RenderClear( renderer );
+
+    SDL_SetRenderDrawColor( renderer, 0xFF, 0XFF, 0XFF, 0XFF );
+    
+    net.Draw();
+    
+    ball.Draw();
+    
+    p1Paddle.Draw();
+    p2Paddle.Draw();
+
+    p1Score.Draw();
+    p2Score.Draw();
+
+    SDL_RenderPresent( renderer );
+}
+
+void updateAll ( Ball &ball, Paddle &p1Paddle, Paddle &p2Paddle, PlayerScore &p1Score, PlayerScore &p2Score )
+{
+    ball.position += Vec2(0.3f, 0);
+}
+
 int main( int argc, char* args[] )
 {
     if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
@@ -40,11 +65,11 @@ int main( int argc, char* args[] )
 
     Ball ball( Vec2( Constants::WindowWidth / 2.0f - Constants::BallHeight / 2.0f, Constants::WindowHeight / 2.0f - Constants::BallHeight / 2.0f ), renderer, Constants::BallHeight );
     
-    Paddle paddleOne( Vec2( Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ), renderer,  Constants::PaddleHeight, Constants::PaddleWidth );
-    Paddle paddleTwo( Vec2( Constants::WindowWidth - Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ), renderer, Constants::PaddleHeight, Constants::PaddleWidth );
+    Paddle p1Paddle( Vec2( Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ), renderer,  Constants::PaddleHeight, Constants::PaddleWidth );
+    Paddle p2Paddle( Vec2( Constants::WindowWidth - Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ), renderer, Constants::PaddleHeight, Constants::PaddleWidth );
     
-    PlayerScore playerOneScoreText( Vec2( Constants::WindowWidth / 4, 20 ), renderer, scoreFont );
-    PlayerScore playerTwoScoreText( Vec2( 3 * Constants::WindowWidth / 4, 20 ), renderer, scoreFont );
+    PlayerScore p1Score( Vec2( Constants::WindowWidth / 4, 20 ), renderer, scoreFont );
+    PlayerScore p2Score( Vec2( 3 * Constants::WindowWidth / 4, 20 ), renderer, scoreFont );
     
     bool running = true;
     while ( running )
@@ -54,25 +79,10 @@ int main( int argc, char* args[] )
         {
             if ( event.type == SDL_QUIT ) running = false;
             if ( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE ) running = false;
-        }
+        }   
 
-        SDL_SetRenderDrawColor( renderer, 0x0, 0x0, 0xFF, 0xFF );
-        SDL_RenderClear( renderer );
-
-        SDL_SetRenderDrawColor( renderer, 0xFF, 0XFF, 0XFF, 0XFF );
-        
-        net.Draw();
-        
-        // ball.position += Vec2(0.3, 0);
-        ball.Draw();
-        
-        paddleOne.Draw();
-        paddleTwo.Draw();
-
-        playerOneScoreText.Draw();
-        playerTwoScoreText.Draw();
-
-        SDL_RenderPresent( renderer );
+        updateAll( ball, p1Paddle, p2Paddle, p1Score, p2Score );
+        drawAll( renderer, net, ball, p1Paddle, p2Paddle, p1Score, p2Score );
     }
 
     SDL_DestroyRenderer( renderer );
