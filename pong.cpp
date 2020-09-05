@@ -2,10 +2,10 @@
 #include <iostream>
 
 #include "assets/Ball.h"
-#include "assets/Constants.h"
 #include "assets/Net.h"
 #include "assets/Paddle.h"
 #include "assets/Vec2.h"
+#include "Constants.h"
 
 int main( int argc, char* args[] )
 {
