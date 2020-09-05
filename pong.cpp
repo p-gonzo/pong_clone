@@ -6,6 +6,7 @@
 #include "assets/Ball.h"
 #include "assets/Net.h"
 #include "assets/Paddle.h"
+#include "assets/PlayerScore.h"
 #include "assets/Vec2.h"
 #include "Constants.h"
 
@@ -35,11 +36,14 @@ int main( int argc, char* args[] )
     TTF_Font *scoreFont { TTF_OpenFont( "DejaVuSansMono.ttf", 40 ) };
 
     Ball ball( Vec2( Constants::WindowWidth / 2.0f - Constants::BallHeight / 2.0f, Constants::WindowHeight / 2.0f - Constants::BallHeight / 2.0f ), Constants::BallHeight );
+    
     Paddle paddleOne( Vec2( Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ), Constants::PaddleHeight, Constants::PaddleWidth );
     Paddle paddleTwo( Vec2( Constants::WindowWidth - Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ), Constants::PaddleHeight, Constants::PaddleWidth );
-
+    
+    PlayerScore playerOneScoreText( Vec2( Constants::WindowWidth / 4, 20 ), renderer, scoreFont );
+    PlayerScore playerTwoScoreText( Vec2( 3 * Constants::WindowWidth / 4, 20 ), renderer, scoreFont );
+    
     bool running = true;
-
     while ( running )
     {
         SDL_Event event;
@@ -53,11 +57,17 @@ int main( int argc, char* args[] )
         SDL_RenderClear( renderer );
 
         SDL_SetRenderDrawColor( renderer, 0xFF, 0XFF, 0XFF, 0XFF );
+        
         Net::Draw( renderer, Constants::WindowHeight, Constants::WindowWidth );
+        
         ball.position += Vec2(0.3, 0);
         ball.Draw( renderer );
+        
         paddleOne.Draw ( renderer );
         paddleTwo.Draw ( renderer );
+
+        playerOneScoreText.Draw();
+        playerTwoScoreText.Draw();
 
         SDL_RenderPresent( renderer ); // present the "backbuffer"
     }

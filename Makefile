@@ -1,4 +1,4 @@
-OBJS = assets/Vec2.cpp assets/Ball.cpp assets/Paddle.cpp assets/Net.cpp pong.cpp
+OBJS = assets/Vec2.cpp assets/Ball.cpp assets/Paddle.cpp assets/PlayerScore.cpp assets/Net.cpp pong.cpp
 CC = g++
 # -w suppresses all warnings
 COMPILER_FLAGS = -w -std=c++17
