@@ -5,7 +5,14 @@
 class Net
 {
 private:
-    Net();
+    Net() {};
+    Net( const Net& );
+    const Net& operator=( const Net& );
+    
+    SDL_Renderer *renderer;
+
 public:
-    static void Draw( SDL_Renderer* renderer, int windowHeight, int windowWidth );
+    static Net& GetInstance();
+    void SetRenderer( SDL_Renderer *r );
+    void Draw();
 };

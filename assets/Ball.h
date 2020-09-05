@@ -7,9 +7,10 @@
 class Ball
 {
 public:
-	Ball( Vec2 position, int diameter );
-	void Draw( SDL_Renderer* renderer );
+	Ball( Vec2 position, SDL_Renderer* renderer, int diameter );
+	void Draw();
 
 	Vec2 position;
+	SDL_Renderer* renderer;
 	SDL_Rect rect;
 };

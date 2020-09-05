@@ -35,10 +35,13 @@ int main( int argc, char* args[] )
 
     TTF_Font *scoreFont { TTF_OpenFont( "DejaVuSansMono.ttf", 40 ) };
 
-    Ball ball( Vec2( Constants::WindowWidth / 2.0f - Constants::BallHeight / 2.0f, Constants::WindowHeight / 2.0f - Constants::BallHeight / 2.0f ), Constants::BallHeight );
+    Net& net { Net::GetInstance() };
+    net.SetRenderer( renderer );
+
+    Ball ball( Vec2( Constants::WindowWidth / 2.0f - Constants::BallHeight / 2.0f, Constants::WindowHeight / 2.0f - Constants::BallHeight / 2.0f ), renderer, Constants::BallHeight );
     
-    Paddle paddleOne( Vec2( Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ), Constants::PaddleHeight, Constants::PaddleWidth );
-    Paddle paddleTwo( Vec2( Constants::WindowWidth - Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ), Constants::PaddleHeight, Constants::PaddleWidth );
+    Paddle paddleOne( Vec2( Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ), renderer,  Constants::PaddleHeight, Constants::PaddleWidth );
+    Paddle paddleTwo( Vec2( Constants::WindowWidth - Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ), renderer, Constants::PaddleHeight, Constants::PaddleWidth );
     
     PlayerScore playerOneScoreText( Vec2( Constants::WindowWidth / 4, 20 ), renderer, scoreFont );
     PlayerScore playerTwoScoreText( Vec2( 3 * Constants::WindowWidth / 4, 20 ), renderer, scoreFont );
@@ -58,18 +61,18 @@ int main( int argc, char* args[] )
 
         SDL_SetRenderDrawColor( renderer, 0xFF, 0XFF, 0XFF, 0XFF );
         
-        Net::Draw( renderer, Constants::WindowHeight, Constants::WindowWidth );
+        net.Draw();
         
-        ball.position += Vec2(0.3, 0);
-        ball.Draw( renderer );
+        // ball.position += Vec2(0.3, 0);
+        ball.Draw();
         
-        paddleOne.Draw ( renderer );
-        paddleTwo.Draw ( renderer );
+        paddleOne.Draw();
+        paddleTwo.Draw();
 
         playerOneScoreText.Draw();
         playerTwoScoreText.Draw();
 
-        SDL_RenderPresent( renderer ); // present the "backbuffer"
+        SDL_RenderPresent( renderer );
     }
 
     SDL_DestroyRenderer( renderer );

@@ -1,7 +1,7 @@
 #include "Ball.h"
 
-Ball::Ball( Vec2 pos, int diameter )
-    :position( pos )
+Ball::Ball( Vec2 pos, SDL_Renderer* renderer, int diameter )
+    :position( pos ), renderer( renderer )
 {
     rect.x = static_cast<int>( position.x );
     rect.y = static_cast<int>( position.y );
@@ -9,7 +9,7 @@ Ball::Ball( Vec2 pos, int diameter )
     rect.w = diameter;
 }
 
-void Ball::Draw( SDL_Renderer *renderer)
+void Ball::Draw()
 {
     rect.x = static_cast<int>( position.x );
     rect.y = static_cast<int>( position.y );
