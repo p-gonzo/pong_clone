@@ -1,6 +1,6 @@
 #include "Ball.h"
 
-Ball::Ball( Vec2 pos )
+Ball::Ball( Vec2 pos, int diameter )
     :position( pos )
 {
     rect.x = static_cast<int>( position.x );

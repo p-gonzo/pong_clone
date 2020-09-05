@@ -3,10 +3,16 @@
 
 #include "assets/Ball.h";
 #include "assets/Net.h";
+#include "assets/Paddle.h"
 #include "assets/Vec2.h";
 
 const int WINDOW_WIDTH { 1280 };
 const int WINDOW_HEIGHT { 720 };
+const int BALL_HEIGHT { 15 };
+const int BALL_WIDTH { 15 };
+const int PADDLE_HEIGHT { 100 };
+const int PADDLE_WIDTH { 10 };
+const float PADDLE_GAP { 50.0f };
 
 int main( int argc, char* args[] )
 {
@@ -25,7 +31,9 @@ int main( int argc, char* args[] )
 
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
 
-    Ball ball( Vec2( WINDOW_WIDTH / 2.0f - ball.radius, WINDOW_HEIGHT / 2.0f - ball.radius ) );
+    Ball ball( Vec2( WINDOW_WIDTH / 2.0f - BALL_HEIGHT / 2.0f, WINDOW_HEIGHT / 2.0f - BALL_HEIGHT / 2.0f ), BALL_HEIGHT );
+    Paddle paddleOne( Vec2( PADDLE_GAP, WINDOW_HEIGHT / 2.0f - PADDLE_HEIGHT / 2.0f ), PADDLE_HEIGHT, PADDLE_WIDTH );
+    Paddle paddleTwo( Vec2( WINDOW_WIDTH - PADDLE_GAP, WINDOW_HEIGHT / 2.0f - PADDLE_HEIGHT / 2.0f ), PADDLE_HEIGHT, PADDLE_WIDTH );
 
     bool running = true;
 
@@ -43,8 +51,10 @@ int main( int argc, char* args[] )
 
         SDL_SetRenderDrawColor( renderer, 0xFF, 0XFF, 0XFF, 0XFF );
         Net::Draw( renderer, WINDOW_HEIGHT, WINDOW_WIDTH );
-        // ball.position += Vec2(1, 0);
+        ball.position += Vec2(0.3, 0);
         ball.Draw( renderer );
+        paddleOne.Draw ( renderer );
+        paddleTwo.Draw ( renderer );
 
         SDL_RenderPresent( renderer ); // present the "backbuffer"
     }
