@@ -39,13 +39,10 @@ void drawAll( SDL_Renderer* renderer, Net &net, Ball &ball, Paddle &p1Paddle, Pa
 {
     SDL_SetRenderDrawColor( renderer, 0x0, 0x0, 0xFF, 0xFF );
     SDL_RenderClear( renderer );
-
     SDL_SetRenderDrawColor( renderer, 0xFF, 0XFF, 0XFF, 0XFF );
     
     net.Draw();
-    
     ball.Draw();
-    
     p1Paddle.Draw();
     p2Paddle.Draw();
 
