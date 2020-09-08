@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
+#include "constants/Enums.h"
 #include "constants/Constants.h"
 #include "sprites/Ball.h"
 #include "sprites/Net.h"
@@ -11,12 +12,28 @@
 #include "sprites/PlayerScore.h"
 #include "sprites/Vec2.h"
 
-void handleEvents( SDL_Event &event, bool &running )
+void handleEvents( SDL_Event &event, bool &running, bool buttons[4] )
 {
     while ( SDL_PollEvent( &event ) )
         {
             if ( event.type == SDL_QUIT ) running = false;
-            if ( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE ) running = false;
+
+            else if ( event.type == SDL_KEYDOWN )
+            {
+                if ( event.key.keysym.sym == SDLK_ESCAPE ) running = false;
+
+                else if ( event.key.keysym.sym == SDLK_w ) { buttons[Buttons::p1PaddleUp] = true; }
+                else if ( event.key.keysym.sym == SDLK_s ) { buttons[Buttons::p1PaddleDown] = true; }
+                else if ( event.key.keysym.sym == SDLK_UP ) { buttons[Buttons::p2PaddleUp] = true; }
+                else if ( event.key.keysym.sym == SDLK_DOWN ) { buttons[Buttons::p2PaddleDown] = true; }
+            }
+            else if ( event.type == SDL_KEYUP )
+            {
+                if ( event.key.keysym.sym == SDLK_w ) { buttons[Buttons::p1PaddleUp] = false; }
+                else if ( event.key.keysym.sym == SDLK_s ) { buttons[Buttons::p1PaddleDown] = false; }
+                else if ( event.key.keysym.sym == SDLK_UP ) { buttons[Buttons::p2PaddleUp] = false; }
+                else if ( event.key.keysym.sym == SDLK_DOWN ) { buttons[Buttons::p2PaddleDown] = false; }
+            }
         }
 }
 
@@ -101,7 +118,7 @@ int main( int argc, char* args[] )
         auto startTime = std::chrono::high_resolution_clock::now();
 
         SDL_Event event;
-        handleEvents( event, running );
+        handleEvents( event, running, buttons );
 
         updateAll( ball, p1Paddle, p2Paddle, p1Score, p2Score, dt );
         drawAll( renderer, net, ball, p1Paddle, p2Paddle, p1Score, p2Score );
