@@ -16,8 +16,12 @@ void Paddle::Draw()
     SDL_RenderFillRect( renderer, &rect );
 }
 
-void Paddle::Update(float dt)
+void Paddle::Update( bool pressedUp, bool pressedDown, float dt )
 {
+    if ( pressedUp ) { velocity.y = -Constants::PaddleSpeed; }
+    else if ( pressedDown ) { velocity.y = Constants::PaddleSpeed; }
+    else { velocity.y = 0.0f; }
+
     position += velocity * dt;
     if ( position.y < 0 ) { position.y = 0; }
     if ( position.y > ( Constants::WindowHeight - Constants::PaddleHeight ) )

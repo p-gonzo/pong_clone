@@ -61,16 +61,8 @@ void updateAll ( Ball &ball, Paddle &p1Paddle, Paddle &p2Paddle, PlayerScore &p1
 {
     // ball.position += Vec2(0.3f, 0);
 
-    if ( buttons[Buttons::p1PaddleUp] ) { p1Paddle.velocity.y = -Constants::PaddleSpeed; }
-    else if ( buttons[Buttons::p1PaddleDown] ) { p1Paddle.velocity.y = Constants::PaddleSpeed; }
-    else { p1Paddle.velocity.y = 0.0f; }
-
-    if ( buttons[Buttons::p2PaddleUp] ) { p2Paddle.velocity.y = -Constants::PaddleSpeed; }
-    else if ( buttons[Buttons::p2PaddleDown] ) { p2Paddle.velocity.y = Constants::PaddleSpeed; }
-    else { p2Paddle.velocity.y = 0.0f; }
-
-    p1Paddle.Update(dt);
-    p2Paddle.Update(dt);
+    p1Paddle.Update( buttons[Buttons::p1PaddleUp], buttons[Buttons::p1PaddleDown], dt);
+    p2Paddle.Update( buttons[Buttons::p2PaddleUp], buttons[Buttons::p2PaddleDown], dt);
 }
 
 int main( int argc, char* args[] )
