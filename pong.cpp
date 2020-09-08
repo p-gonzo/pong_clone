@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -30,7 +31,7 @@ void drawAll( SDL_Renderer* renderer, Net &net, Ball &ball, Paddle &p1Paddle, Pa
     SDL_RenderPresent( renderer );
 }
 
-void updateAll ( Ball &ball, Paddle &p1Paddle, Paddle &p2Paddle, PlayerScore &p1Score, PlayerScore &p2Score )
+void updateAll ( Ball &ball, Paddle &p1Paddle, Paddle &p2Paddle, PlayerScore &p1Score, PlayerScore &p2Score, float &dt )
 {
     ball.position += Vec2(0.3f, 0);
 }
@@ -65,15 +66,30 @@ int main( int argc, char* args[] )
 
     Ball ball( Vec2( Constants::WindowWidth / 2.0f - Constants::BallHeight / 2.0f, Constants::WindowHeight / 2.0f - Constants::BallHeight / 2.0f ), renderer, Constants::BallHeight );
     
-    Paddle p1Paddle( Vec2( Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ), renderer,  Constants::PaddleHeight, Constants::PaddleWidth );
-    Paddle p2Paddle( Vec2( Constants::WindowWidth - Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ), renderer, Constants::PaddleHeight, Constants::PaddleWidth );
+    Paddle p1Paddle(
+        Vec2( Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ),
+        Vec2( 0.0f, 0.0f ),
+        renderer,
+        Constants::PaddleHeight,
+        Constants::PaddleWidth
+    );
+    Paddle p2Paddle(
+        Vec2( Constants::WindowWidth - Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ),
+        Vec2 (0.0f, 0.0f ),
+        renderer,
+        Constants::PaddleHeight,
+        Constants::PaddleWidth
+    );
     
     PlayerScore p1Score( Vec2( Constants::WindowWidth / 4, 20 ), renderer, scoreFont );
     PlayerScore p2Score( Vec2( 3 * Constants::WindowWidth / 4, 20 ), renderer, scoreFont );
     
+    float dt = 0.0f;
     bool running = true;
     while ( running )
     {
+        auto startTime = std::chrono::high_resolution_clock::now();
+
         SDL_Event event;
         while ( SDL_PollEvent( &event ) )
         {
@@ -81,7 +97,10 @@ int main( int argc, char* args[] )
             if ( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE ) running = false;
         }   
 
-        updateAll( ball, p1Paddle, p2Paddle, p1Score, p2Score );
+        auto stopTime = std::chrono::high_resolution_clock::now();
+        dt = std::chrono::duration<float, std::chrono::milliseconds::period>(stopTime - startTime).count();
+
+        updateAll( ball, p1Paddle, p2Paddle, p1Score, p2Score, dt );
         drawAll( renderer, net, ball, p1Paddle, p2Paddle, p1Score, p2Score );
     }
 

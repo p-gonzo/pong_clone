@@ -7,10 +7,12 @@
 class Paddle
 {
 public:
-    Paddle( Vec2 position, SDL_Renderer *renderer, int height, int width );
+    Paddle( Vec2 position, Vec2 velocity, SDL_Renderer *renderer, int height, int width );
     void Draw();
+    void Update(float dt);
     
     Vec2 position;
+    Vec2 velocity;
     SDL_Rect rect {};
     SDL_Renderer *renderer;
 };
