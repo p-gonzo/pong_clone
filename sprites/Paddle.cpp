@@ -1,5 +1,5 @@
 #include "Paddle.h"
-#include "../Constants.h"
+#include "../constants/Constants.h"
 
 Paddle::Paddle( Vec2 pos, Vec2 vel, SDL_Renderer *renderer, int height, int width )
     : position( pos ), velocity( vel ), renderer( renderer )

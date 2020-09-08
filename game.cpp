@@ -4,12 +4,12 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-#include "assets/Ball.h"
-#include "assets/Net.h"
-#include "assets/Paddle.h"
-#include "assets/PlayerScore.h"
-#include "assets/Vec2.h"
-#include "Constants.h"
+#include "constants/Constants.h"
+#include "sprites/Ball.h"
+#include "sprites/Net.h"
+#include "sprites/Paddle.h"
+#include "sprites/PlayerScore.h"
+#include "sprites/Vec2.h"
 
 void drawAll( SDL_Renderer* renderer, Net &net, Ball &ball, Paddle &p1Paddle, Paddle &p2Paddle, PlayerScore &p1Score, PlayerScore &p2Score )
 {
@@ -59,7 +59,7 @@ int main( int argc, char* args[] )
 
     SDL_Renderer* renderer { SDL_CreateRenderer( window, -1, 0 ) }; 
 
-    TTF_Font *scoreFont { TTF_OpenFont( "DejaVuSansMono.ttf", 40 ) };
+    TTF_Font *scoreFont { TTF_OpenFont( "assets/DejaVuSansMono.ttf", 40 ) };
 
     Net& net { Net::GetInstance() };
     net.SetRenderer( renderer );

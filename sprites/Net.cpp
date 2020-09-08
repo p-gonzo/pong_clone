@@ -1,6 +1,6 @@
 #include "Net.h"
 
-#include "../Constants.h"
+#include "../constants/Constants.h"
 
 Net& Net::GetInstance()
 {

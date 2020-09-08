@@ -17,5 +17,5 @@ sudo chmod +x run.sh
 Alternatively, you may use the `Makefile` to generate the binary and run it yourself:
 ```
 make all
-./pong
+./Pong
 ```
