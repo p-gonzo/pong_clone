@@ -9,7 +9,7 @@ class Paddle
 public:
     Paddle( Vec2 position, Vec2 velocity, SDL_Renderer *renderer, int height, int width );
     void Draw();
-    void Update( bool pressedUp, bool pressedDown, float dt );
+    void Update( const bool pressedUp, const bool pressedDown, const float dt );
     
     Vec2 position;
     Vec2 velocity;

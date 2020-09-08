@@ -16,7 +16,7 @@ void Paddle::Draw()
     SDL_RenderFillRect( renderer, &rect );
 }
 
-void Paddle::Update( bool pressedUp, bool pressedDown, float dt )
+void Paddle::Update( const bool pressedUp, const bool pressedDown, const float dt )
 {
     if ( pressedUp ) { velocity.y = -Constants::PaddleSpeed; }
     else if ( pressedDown ) { velocity.y = Constants::PaddleSpeed; }

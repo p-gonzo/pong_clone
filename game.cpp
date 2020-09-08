@@ -4,8 +4,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-#include "constants/Enums.h"
 #include "constants/Constants.h"
+#include "constants/Enums.h"
 #include "sprites/Ball.h"
 #include "sprites/Net.h"
 #include "sprites/Paddle.h"
@@ -54,10 +54,10 @@ void drawAll( SDL_Renderer* renderer, Net &net, Ball &ball, Paddle &p1Paddle, Pa
 
 void updateAll ( Ball &ball, Paddle &p1Paddle, Paddle &p2Paddle, PlayerScore &p1Score, PlayerScore &p2Score, bool buttons[4], float &dt )
 {
-    // ball.position += Vec2(0.3f, 0);
+    p1Paddle.Update( buttons[Buttons::p1PaddleUp], buttons[Buttons::p1PaddleDown], dt );
+    p2Paddle.Update( buttons[Buttons::p2PaddleUp], buttons[Buttons::p2PaddleDown], dt );
 
-    p1Paddle.Update( buttons[Buttons::p1PaddleUp], buttons[Buttons::p1PaddleDown], dt);
-    p2Paddle.Update( buttons[Buttons::p2PaddleUp], buttons[Buttons::p2PaddleDown], dt);
+    ball.Update( p1Paddle, p2Paddle, dt );
 }
 
 int main( int argc, char* args[] )
@@ -88,7 +88,12 @@ int main( int argc, char* args[] )
     Net& net { Net::GetInstance() };
     net.SetRenderer( renderer );
 
-    Ball ball( Vec2( Constants::WindowWidth / 2.0f - Constants::BallHeight / 2.0f, Constants::WindowHeight / 2.0f - Constants::BallHeight / 2.0f ), renderer, Constants::BallHeight );
+    Ball ball(
+        Vec2( Constants::WindowWidth / 2.0f - Constants::BallHeight / 2.0f, Constants::WindowHeight / 2.0f - Constants::BallHeight / 2.0f ),
+        Vec2( Constants::BallSpeed, 0.0f ),
+        renderer,
+        Constants::BallHeight
+    );
     
     Paddle p1Paddle(
         Vec2( Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ),
