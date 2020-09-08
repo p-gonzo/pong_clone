@@ -23,12 +23,18 @@ void Ball::Update( const Paddle &p1Paddle, const Paddle &p2Paddle, const float d
 
     HandlePaddleCollision( p1Paddle, position.x, position.x + Constants::BallWidth, position.y, position.y + Constants::BallHeight );
     HandlePaddleCollision( p2Paddle, position.x, position.x + Constants::BallWidth, position.y, position.y + Constants::BallHeight );
-    HandleWallCollision();
+    HandleWallCollision( position.y, position.y + Constants::BallHeight );
     HandleGoal();
 }
-void Ball::HandleWallCollision()
+void Ball::HandleWallCollision( const float top, const float bottom )
 {
-    if ( position.y >= Constants::WindowHeight || position.y <= 0 ) { velocity.y = -velocity.y; }
+    if ( position.y >= Constants::WindowHeight || position.y <= 0 )
+    {
+        float penetration = velocity.y < 0 ? -top : Constants::WindowHeight - bottom;
+        position.y += penetration;
+        
+        velocity.y = -velocity.y;
+    }
 }
 
 void Ball::HandleGoal()
@@ -52,11 +58,15 @@ void Ball::HandlePaddleCollision( const Paddle &paddle, const float left, const 
 
     if ( left < paddleRight && right > paddleLeft && top < paddleBottom && bottom > paddleTop )
     {
+        float penetration = velocity.x < 0 ? paddleRight - left : paddleLeft - right;
+        position.x += penetration;
+
         float ballYCenter = ( top + bottom ) / 2;
         float paddleYCenter = ( paddleTop + paddleBottom ) / 2;
         float ballPaddleYDelta = ballYCenter - paddleYCenter;
+        velocity.y = ( ballPaddleYDelta / ( 1 + ballPaddleYDelta ) ) * ( ballPaddleYDelta > 0 ? 1 : -1 );
+        velocity.y *= Constants::BallXDeltaScalar;
 
         velocity.x = -velocity.x;
-        velocity.y = ( ballPaddleYDelta / ( 1 + ballPaddleYDelta ) ) * ( ballPaddleYDelta > 0 ? 1 : -1 );
     }
 }

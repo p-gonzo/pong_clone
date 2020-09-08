@@ -18,6 +18,6 @@ public:
     SDL_Rect rect;
 private:
     void HandlePaddleCollision( const Paddle &paddle, const float left, const float right, const float top, const float bottom );
-    void HandleWallCollision();
+    void HandleWallCollision( const float top, const float bottom );
     void HandleGoal();
 };

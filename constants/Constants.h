@@ -11,6 +11,7 @@ public:
     static constexpr auto BallHeight { 15 };
     static constexpr auto BallWidth { 15 };
     static constexpr auto BallSpeed { 1.0f };
+    static constexpr auto BallXDeltaScalar { 0.75f };
     
     static constexpr auto PaddleHeight { 100 };
     static constexpr auto PaddleWidth { 10 };
