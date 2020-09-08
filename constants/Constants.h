@@ -12,4 +12,5 @@ public:
     static constexpr auto PaddleHeight { 100 };
     static constexpr auto PaddleWidth { 10 };
     static constexpr auto PaddleGap { 50.0f };
+    static constexpr auto PaddleSpeed { 1.0f };
 };

@@ -11,6 +11,15 @@
 #include "sprites/PlayerScore.h"
 #include "sprites/Vec2.h"
 
+void handleEvents( SDL_Event &event, bool &running )
+{
+    while ( SDL_PollEvent( &event ) )
+        {
+            if ( event.type == SDL_QUIT ) running = false;
+            if ( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE ) running = false;
+        }
+}
+
 void drawAll( SDL_Renderer* renderer, Net &net, Ball &ball, Paddle &p1Paddle, Paddle &p2Paddle, PlayerScore &p1Score, PlayerScore &p2Score )
 {
     SDL_SetRenderDrawColor( renderer, 0x0, 0x0, 0xFF, 0xFF );
@@ -84,24 +93,21 @@ int main( int argc, char* args[] )
     PlayerScore p1Score( Vec2( Constants::WindowWidth / 4, 20 ), renderer, scoreFont );
     PlayerScore p2Score( Vec2( 3 * Constants::WindowWidth / 4, 20 ), renderer, scoreFont );
     
-    float dt = 0.0f;
+    bool buttons[4] = {};
     bool running = true;
+    float dt = 0.0f;
     while ( running )
     {
         auto startTime = std::chrono::high_resolution_clock::now();
 
         SDL_Event event;
-        while ( SDL_PollEvent( &event ) )
-        {
-            if ( event.type == SDL_QUIT ) running = false;
-            if ( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE ) running = false;
-        }   
-
-        auto stopTime = std::chrono::high_resolution_clock::now();
-        dt = std::chrono::duration<float, std::chrono::milliseconds::period>(stopTime - startTime).count();
+        handleEvents( event, running );
 
         updateAll( ball, p1Paddle, p2Paddle, p1Score, p2Score, dt );
         drawAll( renderer, net, ball, p1Paddle, p2Paddle, p1Score, p2Score );
+
+        auto stopTime = std::chrono::high_resolution_clock::now();
+        dt = std::chrono::duration<float, std::chrono::milliseconds::period>(stopTime - startTime).count();
     }
 
     SDL_DestroyRenderer( renderer );
