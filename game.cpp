@@ -57,9 +57,20 @@ void drawAll( SDL_Renderer* renderer, Net &net, Ball &ball, Paddle &p1Paddle, Pa
     SDL_RenderPresent( renderer );
 }
 
-void updateAll ( Ball &ball, Paddle &p1Paddle, Paddle &p2Paddle, PlayerScore &p1Score, PlayerScore &p2Score, float &dt )
+void updateAll ( Ball &ball, Paddle &p1Paddle, Paddle &p2Paddle, PlayerScore &p1Score, PlayerScore &p2Score, bool buttons[4], float &dt )
 {
-    ball.position += Vec2(0.3f, 0);
+    // ball.position += Vec2(0.3f, 0);
+
+    if ( buttons[Buttons::p1PaddleUp] ) { p1Paddle.velocity.y = -Constants::PaddleSpeed; }
+    else if ( buttons[Buttons::p1PaddleDown] ) { p1Paddle.velocity.y = Constants::PaddleSpeed; }
+    else { p1Paddle.velocity.y = 0.0f; }
+
+    if ( buttons[Buttons::p2PaddleUp] ) { p2Paddle.velocity.y = -Constants::PaddleSpeed; }
+    else if ( buttons[Buttons::p2PaddleDown] ) { p2Paddle.velocity.y = Constants::PaddleSpeed; }
+    else { p2Paddle.velocity.y = 0.0f; }
+
+    p1Paddle.Update(dt);
+    p2Paddle.Update(dt);
 }
 
 int main( int argc, char* args[] )
@@ -120,7 +131,7 @@ int main( int argc, char* args[] )
         SDL_Event event;
         handleEvents( event, running, buttons );
 
-        updateAll( ball, p1Paddle, p2Paddle, p1Score, p2Score, dt );
+        updateAll( ball, p1Paddle, p2Paddle, p1Score, p2Score, buttons, dt );
         drawAll( renderer, net, ball, p1Paddle, p2Paddle, p1Score, p2Score );
 
         auto stopTime = std::chrono::high_resolution_clock::now();
