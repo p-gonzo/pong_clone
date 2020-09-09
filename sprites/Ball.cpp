@@ -17,16 +17,20 @@ void Ball::Draw()
     SDL_RenderFillRect( renderer, &rect );
 }
 
-void Ball::Update( const Paddle &p1Paddle, const Paddle &p2Paddle, const float dt )
+CollisionType Ball::Update( const Paddle &p1Paddle, const Paddle &p2Paddle, const float dt )
 {
+    CollisionType collistionType;
+    
     position += velocity * dt;
 
-    HandlePaddleCollision( p1Paddle, position.x, position.x + Constants::BallWidth, position.y, position.y + Constants::BallHeight );
-    HandlePaddleCollision( p2Paddle, position.x, position.x + Constants::BallWidth, position.y, position.y + Constants::BallHeight );
-    HandleWallCollision( position.y, position.y + Constants::BallHeight );
-    HandleGoal();
+    collistionType = HandlePaddleCollision( p1Paddle, position.x, position.x + Constants::BallWidth, position.y, position.y + Constants::BallHeight );
+    collistionType = HandlePaddleCollision( p2Paddle, position.x, position.x + Constants::BallWidth, position.y, position.y + Constants::BallHeight );
+    collistionType = HandleWallCollision( position.y, position.y + Constants::BallHeight );
+    collistionType = HandleGoal();
+    
+    return collistionType;
 }
-void Ball::HandleWallCollision( const float top, const float bottom )
+CollisionType Ball::HandleWallCollision( const float top, const float bottom )
 {
     if ( position.y >= Constants::WindowHeight || position.y <= 0 )
     {
@@ -34,21 +38,28 @@ void Ball::HandleWallCollision( const float top, const float bottom )
         position.y += penetration;
         
         velocity.y = -velocity.y;
+        return CollisionType::Wall;
     }
+    return CollisionType::None;
 }
 
-void Ball::HandleGoal()
+CollisionType Ball::HandleGoal()
 {
     if ( position.x >= Constants::WindowWidth || position.x <= 0 )
     {
+        auto collistionType =  position.x <= 0 ? CollisionType::Left : CollisionType::Right;
+        
         velocity.y = 0.0f;
         velocity.x = 1.0f;
         position.x = ( Constants::WindowWidth / 2.0f ) - ( Constants::BallWidth / 2.0f );
         position.y = ( Constants::WindowHeight / 2.0f ) - ( Constants::BallHeight / 2.0f );
+        
+        return collistionType;
     }
+    return CollisionType::None;
 }
 
-void Ball::HandlePaddleCollision( const Paddle &paddle, const float left, const float right, const float top, const float bottom )
+CollisionType Ball::HandlePaddleCollision( const Paddle &paddle, const float left, const float right, const float top, const float bottom )
 {
 
     float paddleLeft = paddle.position.x;
@@ -68,5 +79,7 @@ void Ball::HandlePaddleCollision( const Paddle &paddle, const float left, const 
         velocity.y *= Constants::BallXDeltaScalar;
 
         velocity.x = -velocity.x;
+        return CollisionType::Paddle;
     }
+    return CollisionType::None;
 }

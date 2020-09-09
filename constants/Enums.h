@@ -7,3 +7,12 @@ enum Buttons
     p2PaddleUp,
     p2PaddleDown
 };
+
+enum class CollisionType
+{
+    None,
+    Paddle,
+    Wall,
+    Left,
+    Right
+};
