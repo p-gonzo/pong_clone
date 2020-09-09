@@ -52,12 +52,17 @@ void drawAll( SDL_Renderer* renderer, Net &net, Ball &ball, Paddle &p1Paddle, Pa
     SDL_RenderPresent( renderer );
 }
 
-void updateAll ( Ball &ball, Paddle &p1Paddle, Paddle &p2Paddle, PlayerScore &p1Score, PlayerScore &p2Score, bool buttons[4], float &dt )
+void updateAll ( bool &running, Ball &ball, Paddle &p1Paddle, Paddle &p2Paddle, PlayerScore &p1Score, PlayerScore &p2Score, bool buttons[4], float &dt )
 {
     p1Paddle.Update( buttons[Buttons::p1PaddleUp], buttons[Buttons::p1PaddleDown], dt );
     p2Paddle.Update( buttons[Buttons::p2PaddleUp], buttons[Buttons::p2PaddleDown], dt );
 
-    ball.Update( p1Paddle, p2Paddle, dt );
+    auto collisionType = ball.Update( p1Paddle, p2Paddle, dt );
+
+    if ( collisionType == CollisionType::Right ) { p1Score.Increment(); }
+    if ( collisionType == CollisionType::Left ) { p2Score.Increment(); }
+
+    if ( p1Score.value == Constants::WinningScore || p2Score.value == Constants::WinningScore ) { running = false; }
 }
 
 int main( int argc, char* args[] )
@@ -123,7 +128,7 @@ int main( int argc, char* args[] )
         SDL_Event event;
         handleEvents( event, running, buttons );
 
-        updateAll( ball, p1Paddle, p2Paddle, p1Score, p2Score, buttons, dt );
+        updateAll( running, ball, p1Paddle, p2Paddle, p1Score, p2Score, buttons, dt );
         drawAll( renderer, net, ball, p1Paddle, p2Paddle, p1Score, p2Score );
 
         auto stopTime = std::chrono::high_resolution_clock::now();
