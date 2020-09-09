@@ -19,15 +19,21 @@ void Ball::Draw()
 
 CollisionType Ball::Update( const Paddle &p1Paddle, const Paddle &p2Paddle, const float dt )
 {
-    CollisionType collistionType;
+    CollisionType collistionType { CollisionType::None };
     
-    position += velocity * dt;
-
-    collistionType = HandlePaddleCollision( p1Paddle, position.x, position.x + Constants::BallWidth, position.y, position.y + Constants::BallHeight );
-    collistionType = HandlePaddleCollision( p2Paddle, position.x, position.x + Constants::BallWidth, position.y, position.y + Constants::BallHeight );
-    collistionType = HandleWallCollision( position.y, position.y + Constants::BallHeight );
-    collistionType = HandleGoal();
-    
+    if (_inPlay)
+    {
+        position += velocity * dt;
+        collistionType = HandlePaddleCollision( p1Paddle, position.x, position.x + Constants::BallWidth, position.y, position.y + Constants::BallHeight );
+        collistionType = HandlePaddleCollision( p2Paddle, position.x, position.x + Constants::BallWidth, position.y, position.y + Constants::BallHeight );
+        collistionType = HandleWallCollision( position.y, position.y + Constants::BallHeight );
+        collistionType = HandleGoal();
+    }
+    else
+    {
+        std::chrono::duration<float> elapsed_seconds = std::chrono::system_clock::now() - _timeScored; 
+        if (elapsed_seconds.count() > secondsBeforeInPay) { _inPlay = true; }
+    }
     return collistionType;
 }
 CollisionType Ball::HandleWallCollision( const float top, const float bottom )
@@ -48,11 +54,14 @@ CollisionType Ball::HandleGoal()
     if ( position.x >= Constants::WindowWidth || position.x <= 0 )
     {
         auto collistionType =  position.x <= 0 ? CollisionType::Left : CollisionType::Right;
-        
+
         velocity.y = 0.0f;
-        velocity.x = 1.0f;
+        velocity.x = collistionType == CollisionType::Left ? 1.0f : -1.0f;
         position.x = ( Constants::WindowWidth / 2.0f ) - ( Constants::BallWidth / 2.0f );
         position.y = ( Constants::WindowHeight / 2.0f ) - ( Constants::BallHeight / 2.0f );
+
+        _timeScored = std::chrono::system_clock::now();
+        _inPlay = false;
         
         return collistionType;
     }

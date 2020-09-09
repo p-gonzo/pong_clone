@@ -2,6 +2,8 @@
 
 #include <SDL2/SDL.h>
 
+#include <chrono>
+
 #include "../constants/Enums.h"
 #include "Paddle.h"
 #include "Vec2.h"
@@ -21,4 +23,8 @@ private:
     CollisionType HandlePaddleCollision( const Paddle &paddle, const float left, const float right, const float top, const float bottom );
     CollisionType HandleWallCollision( const float top, const float bottom );
     CollisionType HandleGoal();
+
+    bool _inPlay { true };
+    static constexpr auto secondsBeforeInPay { 1.0f };
+    std::chrono::time_point<std::chrono::system_clock> _timeScored;
 };
