@@ -19,24 +19,24 @@ void Ball::Draw()
 
 CollisionType Ball::Update( const Paddle &p1Paddle, const Paddle &p2Paddle, const float dt )
 {
-    CollisionType collistionType { CollisionType::None };
-    
+    _collision = CollisionType::None;
+
     if (_inPlay)
     {
         position += velocity * dt;
-        collistionType = HandlePaddleCollision( p1Paddle, position.x, position.x + Constants::BallWidth, position.y, position.y + Constants::BallHeight );
-        collistionType = HandlePaddleCollision( p2Paddle, position.x, position.x + Constants::BallWidth, position.y, position.y + Constants::BallHeight );
-        collistionType = HandleWallCollision( position.y, position.y + Constants::BallHeight );
-        collistionType = HandleGoal();
+        HandlePaddleCollision( p1Paddle, position.x, position.x + Constants::BallWidth, position.y, position.y + Constants::BallHeight );
+        HandlePaddleCollision( p2Paddle, position.x, position.x + Constants::BallWidth, position.y, position.y + Constants::BallHeight );
+        HandleWallCollision( position.y, position.y + Constants::BallHeight );
+        HandleGoal();
     }
     else
     {
         std::chrono::duration<float> elapsed_seconds = std::chrono::system_clock::now() - _timeScored; 
         if (elapsed_seconds.count() > secondsBeforeInPay) { _inPlay = true; }
     }
-    return collistionType;
+    return _collision;
 }
-CollisionType Ball::HandleWallCollision( const float top, const float bottom )
+void Ball::HandleWallCollision( const float top, const float bottom )
 {
     if ( position.y >= Constants::WindowHeight || position.y <= 0 )
     {
@@ -44,31 +44,28 @@ CollisionType Ball::HandleWallCollision( const float top, const float bottom )
         position.y += penetration;
         
         velocity.y = -velocity.y;
-        return CollisionType::Wall;
+        _collision = CollisionType::Wall;
     }
-    return CollisionType::None;
 }
 
-CollisionType Ball::HandleGoal()
+void Ball::HandleGoal()
 {
     if ( position.x >= Constants::WindowWidth || position.x <= 0 )
     {
-        auto collistionType =  position.x <= 0 ? CollisionType::Left : CollisionType::Right;
+        _collision =  position.x <= 0 ? CollisionType::Left : CollisionType::Right;
 
         velocity.y = 0.0f;
-        velocity.x = collistionType == CollisionType::Left ? 1.0f : -1.0f;
+        velocity.x = _collision == CollisionType::Left ? 1.0f : -1.0f;
         position.x = ( Constants::WindowWidth / 2.0f ) - ( Constants::BallWidth / 2.0f );
         position.y = ( Constants::WindowHeight / 2.0f ) - ( Constants::BallHeight / 2.0f );
 
         _timeScored = std::chrono::system_clock::now();
         _inPlay = false;
         
-        return collistionType;
     }
-    return CollisionType::None;
 }
 
-CollisionType Ball::HandlePaddleCollision( const Paddle &paddle, const float left, const float right, const float top, const float bottom )
+void Ball::HandlePaddleCollision( const Paddle &paddle, const float left, const float right, const float top, const float bottom )
 {
 
     float paddleLeft = paddle.position.x;
@@ -88,7 +85,6 @@ CollisionType Ball::HandlePaddleCollision( const Paddle &paddle, const float lef
         velocity.y *= Constants::BallXDeltaScalar;
 
         velocity.x = -velocity.x;
-        return CollisionType::Paddle;
+        _collision =  CollisionType::Paddle;
     }
-    return CollisionType::None;
 }

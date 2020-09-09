@@ -19,12 +19,14 @@ public:
     Vec2 velocity;
     SDL_Renderer* renderer;
     SDL_Rect rect;
+
 private:
-    CollisionType HandlePaddleCollision( const Paddle &paddle, const float left, const float right, const float top, const float bottom );
-    CollisionType HandleWallCollision( const float top, const float bottom );
-    CollisionType HandleGoal();
+    void HandlePaddleCollision( const Paddle &paddle, const float left, const float right, const float top, const float bottom );
+    void HandleWallCollision( const float top, const float bottom );
+    void HandleGoal();
 
     bool _inPlay { true };
     static constexpr auto secondsBeforeInPay { 1.0f };
     std::chrono::time_point<std::chrono::system_clock> _timeScored;
+    CollisionType _collision { CollisionType::None };
 };

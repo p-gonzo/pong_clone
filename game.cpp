@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 
 #include "constants/Constants.h"
 #include "constants/Enums.h"
@@ -52,7 +53,7 @@ void drawAll( SDL_Renderer* renderer, Net &net, Ball &ball, Paddle &p1Paddle, Pa
     SDL_RenderPresent( renderer );
 }
 
-void updateAll ( bool &running, Ball &ball, Paddle &p1Paddle, Paddle &p2Paddle, PlayerScore &p1Score, PlayerScore &p2Score, bool buttons[4], float &dt )
+CollisionType updateAll ( bool &running, Ball &ball, Paddle &p1Paddle, Paddle &p2Paddle, PlayerScore &p1Score, PlayerScore &p2Score, bool buttons[4], float &dt )
 {
     p1Paddle.Update( buttons[Buttons::p1PaddleUp], buttons[Buttons::p1PaddleDown], dt );
     p2Paddle.Update( buttons[Buttons::p2PaddleUp], buttons[Buttons::p2PaddleDown], dt );
@@ -63,11 +64,19 @@ void updateAll ( bool &running, Ball &ball, Paddle &p1Paddle, Paddle &p2Paddle, 
     if ( collisionType == CollisionType::Left ) { p2Score.Increment(); }
 
     if ( p1Score.value == Constants::WinningScore || p2Score.value == Constants::WinningScore ) { running = false; }
+
+    return collisionType;
+}
+
+void handleCollisionSounds(CollisionType &collisionType, Mix_Chunk* wallHitSound, Mix_Chunk* paddleHitSound)
+{
+    if ( collisionType == CollisionType::Paddle ) { Mix_PlayChannel( -1, paddleHitSound, 0 ); }
+    else if ( collisionType == CollisionType::Wall ) { Mix_PlayChannel( -1, wallHitSound, 0 ); }
 }
 
 int main( int argc, char* args[] )
 {
-    if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
+    if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_AUDIO ) < 0 )
     {
         std::cout <<  "SDL could not initialize! SDL_Error: " << SDL_GetError() << std::endl;
         return -1;
@@ -76,6 +85,12 @@ int main( int argc, char* args[] )
     if ( TTF_Init() < 0 )
     {
         std::cout <<  "TTF could not initialize! TTF_Error: " << TTF_GetError() << std::endl;
+        return -1;
+    }
+
+    if ( Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0 )
+    {
+        std::cout <<  "Mixer could not initialize! TTF_Error: " << TTF_GetError() << std::endl;
         return -1;
     }
 
@@ -89,6 +104,19 @@ int main( int argc, char* args[] )
     SDL_Renderer* renderer { SDL_CreateRenderer( window, -1, 0 ) }; 
 
     TTF_Font *scoreFont { TTF_OpenFont( "assets/DejaVuSansMono.ttf", 40 ) };
+
+    Mix_Chunk* wallHitSound = Mix_LoadWAV( "assets/WallHit.wav" );
+    if ( wallHitSound == NULL )
+    {
+        std::cout <<  "Mixer could not load wall hit! TTF_Error: " << TTF_GetError() << std::endl;
+        return -1;
+    }
+    Mix_Chunk* paddleHitSound = Mix_LoadWAV( "assets/PaddleHit.wav" );
+    if ( paddleHitSound == NULL )
+    {
+        std::cout <<  "Mixer could not load paddle hit! TTF_Error: " << TTF_GetError() << std::endl;
+        return -1;
+    }
 
     Net& net { Net::GetInstance() };
     net.SetRenderer( renderer );
@@ -128,16 +156,20 @@ int main( int argc, char* args[] )
         SDL_Event event;
         handleEvents( event, running, buttons );
 
-        updateAll( running, ball, p1Paddle, p2Paddle, p1Score, p2Score, buttons, dt );
+        auto collistionType = updateAll( running, ball, p1Paddle, p2Paddle, p1Score, p2Score, buttons, dt );
         drawAll( renderer, net, ball, p1Paddle, p2Paddle, p1Score, p2Score );
+        handleCollisionSounds( collistionType, wallHitSound, paddleHitSound );
 
         auto stopTime = std::chrono::high_resolution_clock::now();
         dt = std::chrono::duration<float, std::chrono::milliseconds::period>(stopTime - startTime).count();
     }
 
+    Mix_FreeChunk( wallHitSound );
+    Mix_FreeChunk( paddleHitSound );
     SDL_DestroyRenderer( renderer );
     SDL_DestroyWindow( window );
     TTF_CloseFont( scoreFont );
+    Mix_Quit();
     TTF_Quit();
     SDL_Quit();
 
