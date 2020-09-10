@@ -6,4 +6,6 @@ LINKER_FLAGS = -lSDL2 -lSDL2_ttf -lSDL2_mixer
 #OBJ_NAME specifies the name of our exectuable
 OBJ_NAME = build/Pong
 all : $(OBJS)
-	$(CC) -o $(OBJ_NAME) $(OBJS) $(COMPILER_FLAGS) $(LINKER_FLAGS)
+	$(CC) $(COMPILER_FLAGS) -o $(OBJ_NAME) $(OBJS) $(LINKER_FLAGS)
+nn : neural-network/nn_test.cpp
+	$(CC) $(COMPILER_FLAGS) -o build/nn_test neural-network/nn_test.cpp
