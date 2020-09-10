@@ -4,6 +4,6 @@ CC = g++
 COMPILER_FLAGS = -w -std=c++17
 LINKER_FLAGS = -lSDL2 -lSDL2_ttf -lSDL2_mixer
 #OBJ_NAME specifies the name of our exectuable
-OBJ_NAME = Pong
+OBJ_NAME = build/Pong
 all : $(OBJS)
-	$(CC) $(OBJS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)
+	$(CC) -o $(OBJ_NAME) $(OBJS) $(COMPILER_FLAGS) $(LINKER_FLAGS)

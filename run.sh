@@ -1,1 +1,1 @@
-make all && ./Pong && rm Pong
+make all && build/Pong
