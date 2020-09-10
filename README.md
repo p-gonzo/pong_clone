@@ -4,9 +4,13 @@ A clone of the classic Pong Game written in C++ with SDL2
 
 ## Requirements
 
-SDL2 installed
+SDL2, SDL2_ttf, SDL2_mixer
 
-## Running
+## Compiling and Running
+
+```
+mkdir build
+```
 
 A `run.sh` script is included as part of this repo to handle building, running, and removing the binary.  You may use it by first setting its execute bit and then running the script:
 ```
