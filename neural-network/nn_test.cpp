@@ -1,36 +1,45 @@
 #include <iostream>
+#include <string>
+#include <random>
+#include <stdio.h>
+#include <time.h>
+#include <vector>
 
-template <typename T>
-void displayArray(const int y, T *ptr)
+using Matrix = std::vector<std::vector<double>>;
+using Vector = std::vector<double>;
+
+std::default_random_engine generator( time( NULL ) );
+
+Vector generateRandomNormalDistVector(const int size)
 {
-    for ( int j = 0; j < y; ++j )
+    Vector vec;
+    std::normal_distribution<float>distribution( 0.0, 0.75 );
+
+
+    for ( int i = 0; i < size; ++i )
     {
-        std::cout << ptr[j] << " ";
+        vec.push_back( distribution( generator ) );
     }
-    std::cout << std::endl;
+    return vec;
 }
 
-template <typename T>
-void displayTensor(const int x, const int y, T *ptr)
+Matrix generateRandomNormalDistMatrix( const int x, const int y )
 {
-    for ( int i = 0; i < x; ++i ) 
+    Matrix mat;
+    for (int i = 0; i < x; ++i )
     {
-        displayArray(y, ptr[i]);
+        mat.push_back ( generateRandomNormalDistVector( y ) );
     }
+    return mat;
 }
 
 int main()
 {
-    float inputLayer[5] { 0.5, 0.5, 0.5, 0.5, 0.5 };
-    
-    int x[3][4] {
-        { 0, 1, 2, 3 },
-        { 4, 5, 6, 7 },
-        { 8, 9, 10, 11 }
-    };
+    Vector inputLayer(5, 0.5);
+    Matrix denseLayerWeights = generateRandomNormalDistMatrix( 5, 8 );
+    Vector denseLayerBiases( 8, 0.0 );
+    Matrix outputLayerWeights = generateRandomNormalDistMatrix( 8, 3 );
+    Vector outputLayerBiases( 3, 0.0 );
 
-    displayTensor(3, 4, x);
-    std::cout << std::endl;
-    displayArray(5, inputLayer);
-
+    return 0;
 }
