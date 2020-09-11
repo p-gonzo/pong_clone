@@ -8,4 +8,4 @@ OBJ_NAME = build/Pong
 all : $(OBJS)
 	$(CC) $(COMPILER_FLAGS) -o $(OBJ_NAME) $(OBJS) $(LINKER_FLAGS)
 nn : neural-network/nn_test.cpp
-	$(CC) $(COMPILER_FLAGS) -o build/nn_test neural-network/nn_test.cpp
+	$(CC) $(COMPILER_FLAGS) -o build/nn_test neural-network/PaddleBrain.cpp neural-network/nn_test.cpp
