@@ -32,8 +32,6 @@ void AIPaddle::AutoUpdate( const Ball &ball, const float dt )
 
     previousPosition.y = position.y;
 
-    std::cout << velocity.y << std::endl;
-
     position += velocity * dt;
     if ( position.y < 0 ) { position.y = 0; }
     if ( position.y > ( Constants::WindowHeight - Constants::PaddleHeight ) )
