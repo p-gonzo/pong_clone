@@ -3,7 +3,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-#include "Vec2.h"
+#include "../structs/Vec2.h"
+#include "../structs/Rgba.h"
 
 class PlayerScore
 {
@@ -11,7 +12,7 @@ public:
     PlayerScore( Vec2 position, SDL_Renderer* renderer, TTF_Font* font );
 
     ~PlayerScore();
-    void Draw();
+    void Draw( const Rgba &color );
     void Increment();
     void Clear();
 

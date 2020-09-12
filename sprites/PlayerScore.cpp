@@ -16,8 +16,9 @@ PlayerScore::~PlayerScore()
     CleanUpTextures();
 }
 
-void PlayerScore::Draw()
+void PlayerScore::Draw( const Rgba &color )
 {
+    SDL_SetRenderDrawColor( renderer, color.r, color.g, color.b, color.a );
     SDL_RenderCopy( renderer, texture, nullptr, &rect );
 }
 

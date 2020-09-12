@@ -10,8 +10,9 @@ Paddle::Paddle( Vec2 pos, Vec2 vel, SDL_Renderer *renderer, int height, int widt
     rect.w = width;
 }
 
-void Paddle::Draw()
+void Paddle::Draw( const Rgba &color )
 {
+    SDL_SetRenderDrawColor( renderer, color.r, color.g, color.b, color.a );
     rect.y = static_cast<int>( position.y );
     SDL_RenderFillRect( renderer, &rect );
 }

@@ -1,8 +1,7 @@
 #pragma once
 
-class Vec2
+struct Vec2
 {
-public:
 	Vec2();
 	Vec2( float X, float Y );
 	Vec2 operator+( Vec2 const &rhs );

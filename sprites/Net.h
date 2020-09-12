@@ -2,6 +2,8 @@
 
 #include <SDL2/SDL.h>
 
+#include "../structs/Rgba.h"
+
 class Net
 {
 private:
@@ -14,5 +16,5 @@ private:
 public:
     static Net& GetInstance();
     void SetRenderer( SDL_Renderer *r );
-    void Draw();
+    void Draw( const Rgba &color );
 };

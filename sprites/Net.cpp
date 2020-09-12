@@ -13,8 +13,9 @@ void Net::SetRenderer( SDL_Renderer *r )
     renderer = r;
 }
 
-void Net::Draw()
+void Net::Draw( const Rgba &color )
 {
+    SDL_SetRenderDrawColor( renderer, color.r, color.g, color.b, color.a );
     for ( int y = 0; y < Constants::WindowHeight; ++y )
     {
         if ( y % 5 == 0 )

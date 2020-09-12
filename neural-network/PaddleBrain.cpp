@@ -9,7 +9,7 @@ PaddleBrain::PaddleBrain()
 
 Prediction PaddleBrain::Predict(Vector<float> inputLayer)
 {
-    Matrix<float> denseLayerWeights = GenerateRandomNormalDist( 5, 8 );
+    Matrix<float> denseLayerWeights = GenerateRandomNormalDist( inputLayer.size(), 8 );
     Vector<float> denseLayerBiases( 8, 0.0f );
     Matrix<float> outputLayerWeights = GenerateRandomNormalDist( 8, 3 );
     Vector<float> outputLayerBiases( 3, 0.0f );
@@ -19,14 +19,10 @@ Prediction PaddleBrain::Predict(Vector<float> inputLayer)
 
     Vector<float> outputLayer = Sum( DotProduct( denseLayer, outputLayerWeights ), outputLayerBiases );
     Softmax( outputLayer );
-    
-    int highestIndex = 0;
-    float highestVal = 0.0f;
-    for ( auto i = 0; i < outputLayer.size(); ++i )
-    {
-        if ( outputLayer[i] > highestVal ) { highestVal = outputLayer[i]; highestIndex = i; }
-    }
-    return Prediction(highestIndex);
+
+    if ( outputLayer[0] > 0.5 ) { return Prediction::Up; }
+    else if ( outputLayer[2] > 0.5 ) { return Prediction::Down; }
+    else return Prediction::Stay;
 }
 
 Vector<float> PaddleBrain::GenerateRandomNormalDist(const int size)

@@ -10,8 +10,9 @@ Ball::Ball( Vec2 pos, Vec2 vel, SDL_Renderer* renderer, int diameter )
     rect.w = diameter;
 }
 
-void Ball::Draw()
+void Ball::Draw( const Rgba &color )
 {
+    SDL_SetRenderDrawColor( renderer, color.r, color.g, color.b, color.a );
     rect.x = static_cast<int>( position.x );
     rect.y = static_cast<int>( position.y );
     SDL_RenderFillRect( renderer, &rect );
@@ -36,6 +37,7 @@ CollisionType Ball::Update( const Paddle &p1Paddle, const Paddle &p2Paddle, cons
     }
     return _collision;
 }
+
 void Ball::HandleWallCollision( const float top, const float bottom )
 {
     if ( position.y >= Constants::WindowHeight || position.y <= 0 )

@@ -6,13 +6,14 @@
 
 #include "../constants/Enums.h"
 #include "Paddle.h"
-#include "Vec2.h"
+#include "../structs/Vec2.h"
+#include "../structs/Rgba.h"
 
 class Ball
 {
 public:
     Ball( Vec2 position, Vec2 velocity, SDL_Renderer* renderer, int diameter );
-    void Draw();
+    void Draw( const Rgba &color );
     CollisionType Update( const Paddle &p1Paddle, const Paddle &p2Paddle, const float dt );
 
     Vec2 position;

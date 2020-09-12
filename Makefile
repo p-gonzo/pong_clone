@@ -1,4 +1,4 @@
-OBJS = sprites/Vec2.cpp sprites/Ball.cpp sprites/Paddle.cpp sprites/PlayerScore.cpp sprites/Net.cpp neural-network/PaddleBrain.cpp neural-network/AIPaddle.cpp game.cpp
+OBJS = structs/Vec2.cpp sprites/Ball.cpp sprites/Paddle.cpp sprites/PlayerScore.cpp sprites/Net.cpp neural-network/PaddleBrain.cpp neural-network/AIPaddle.cpp game.cpp
 CC = g++
 # -w suppresses all warnings
 COMPILER_FLAGS = -w -std=c++17

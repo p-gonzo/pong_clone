@@ -1,5 +1,6 @@
 #include <iostream>
 #include <chrono>
+#include <vector>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -11,7 +12,8 @@
 #include "sprites/Net.h"
 #include "sprites/Paddle.h"
 #include "sprites/PlayerScore.h"
-#include "sprites/Vec2.h"
+#include "structs/Vec2.h"
+#include "structs/Rgba.h"
 
 #include "neural-network/AIPaddle.h"
 
@@ -40,17 +42,16 @@ void handleEvents( SDL_Event &event, bool &running, bool buttons[4] )
 
 void drawAll( SDL_Renderer* renderer, Net &net, Ball &ball, Paddle &p1Paddle, AIPaddle &aiPaddle, PlayerScore &p1Score, PlayerScore &p2Score )
 {
-    SDL_SetRenderDrawColor( renderer, 0x0, 0x0, 0xFF, 0xFF );
+    SDL_SetRenderDrawColor( renderer, 0x0, 0x0, 0x00, 0xFF );
     SDL_RenderClear( renderer );
-    SDL_SetRenderDrawColor( renderer, 0xFF, 0XFF, 0XFF, 0XFF );
     
-    net.Draw();
-    ball.Draw();
-    p1Paddle.Draw();
-    aiPaddle.Draw();
+    net.Draw( Rgba{ 0xFF, 0XFF, 0XFF, 0XFF } );
+    ball.Draw( Rgba{ 0xFF, 0XFF, 0XFF, 0XFF } );
+    p1Paddle.Draw( Rgba{ 0x00, 0XFF, 0XFF, 0XFF } );
+    aiPaddle.Draw( Rgba{ 0xFF, 0X00, 0XFF, 0XFF } );
 
-    p1Score.Draw();
-    p2Score.Draw();
+    p1Score.Draw( Rgba{ 0x00, 0XFF, 0XFF, 0XFF } );
+    p2Score.Draw( Rgba{ 0xFF, 0X00, 0XFF, 0XFF } );
 
     SDL_RenderPresent( renderer );
 }
