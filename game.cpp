@@ -13,6 +13,8 @@
 #include "sprites/PlayerScore.h"
 #include "sprites/Vec2.h"
 
+#include "neural-network/AIPaddle.h"
+
 void handleEvents( SDL_Event &event, bool &running, bool buttons[4] )
 {
     while ( SDL_PollEvent( &event ) )
@@ -36,7 +38,7 @@ void handleEvents( SDL_Event &event, bool &running, bool buttons[4] )
     }
 }
 
-void drawAll( SDL_Renderer* renderer, Net &net, Ball &ball, Paddle &p1Paddle, Paddle &p2Paddle, PlayerScore &p1Score, PlayerScore &p2Score )
+void drawAll( SDL_Renderer* renderer, Net &net, Ball &ball, Paddle &p1Paddle, AIPaddle &aiPaddle, PlayerScore &p1Score, PlayerScore &p2Score )
 {
     SDL_SetRenderDrawColor( renderer, 0x0, 0x0, 0xFF, 0xFF );
     SDL_RenderClear( renderer );
@@ -45,7 +47,7 @@ void drawAll( SDL_Renderer* renderer, Net &net, Ball &ball, Paddle &p1Paddle, Pa
     net.Draw();
     ball.Draw();
     p1Paddle.Draw();
-    p2Paddle.Draw();
+    aiPaddle.Draw();
 
     p1Score.Draw();
     p2Score.Draw();
@@ -53,12 +55,12 @@ void drawAll( SDL_Renderer* renderer, Net &net, Ball &ball, Paddle &p1Paddle, Pa
     SDL_RenderPresent( renderer );
 }
 
-CollisionType updateAll ( bool &running, Ball &ball, Paddle &p1Paddle, Paddle &p2Paddle, PlayerScore &p1Score, PlayerScore &p2Score, bool buttons[4], float &dt )
+CollisionType updateAll ( bool &running, Ball &ball, Paddle &p1Paddle, AIPaddle &aiPaddle, PlayerScore &p1Score, PlayerScore &p2Score, bool buttons[4], float &dt )
 {
     p1Paddle.Update( buttons[Buttons::p1PaddleUp], buttons[Buttons::p1PaddleDown], dt );
-    p2Paddle.Update( buttons[Buttons::p2PaddleUp], buttons[Buttons::p2PaddleDown], dt );
+    aiPaddle.AutoUpdate( ball, dt );
 
-    auto collisionType = ball.Update( p1Paddle, p2Paddle, dt );
+    auto collisionType = ball.Update( p1Paddle, aiPaddle, dt );
 
     if ( collisionType == CollisionType::Right ) { p1Score.Increment(); }
     if ( collisionType == CollisionType::Left ) { p2Score.Increment(); }
@@ -135,7 +137,7 @@ int main( int argc, char* args[] )
         Constants::PaddleHeight,
         Constants::PaddleWidth
     );
-    Paddle p2Paddle(
+    AIPaddle aiPaddle(
         Vec2( Constants::WindowWidth - Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ),
         Vec2 (0.0f, 0.0f ),
         renderer,
@@ -156,8 +158,8 @@ int main( int argc, char* args[] )
         SDL_Event event;
         handleEvents( event, running, buttons );
 
-        auto collistionType = updateAll( running, ball, p1Paddle, p2Paddle, p1Score, p2Score, buttons, dt );
-        drawAll( renderer, net, ball, p1Paddle, p2Paddle, p1Score, p2Score );
+        auto collistionType = updateAll( running, ball, p1Paddle, aiPaddle, p1Score, p2Score, buttons, dt );
+        drawAll( renderer, net, ball, p1Paddle, aiPaddle, p1Score, p2Score );
         handleCollisionSounds( collistionType, wallHitSound, paddleHitSound );
 
         auto stopTime = std::chrono::high_resolution_clock::now();
