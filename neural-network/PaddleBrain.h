@@ -12,8 +12,9 @@ class PaddleBrain
 {
 public:
 
-    PaddleBrain();
+    PaddleBrain( const int i );
     Prediction Predict(Vector<float> inputLayer);
+    std::default_random_engine generator;
 
 private:
     Vector<float> GenerateRandomNormalDist(const int size);
@@ -23,6 +24,5 @@ private:
     void ReLUActivation( Vector<float> &vec );
     void Softmax( Vector<float> &vec );
 
-    std::default_random_engine generator;
 
 };

@@ -8,12 +8,14 @@
 
 #include "constants/Constants.h"
 #include "constants/Enums.h"
+#include "neural-network/PaddleBrain.h"
 #include "sprites/Ball.h"
 #include "sprites/Net.h"
 #include "sprites/Paddle.h"
 #include "sprites/PlayerScore.h"
 #include "structs/Rgba.h"
 #include "structs/Vec2.h"
+
 
 void handleEvents( SDL_Event &event, bool &running, bool buttons[4] )
 {
@@ -77,6 +79,31 @@ CollisionType updateAll ( bool &running, std::vector<Ball> &balls, Paddle &p1Pad
     return collisionType;
 }
 
+float transpose( float value, float leftMin, float leftMax, float rightMin, float rightMax )
+{
+    float leftSpan = leftMax - leftMin;
+    float rightSpan = rightMax - rightMin;
+    float valueScaled = ( value - leftMin ) / leftSpan;
+    return rightMin + ( valueScaled * rightSpan );
+}
+
+void updateForTraining ( bool &running, std::vector<Ball> &balls, Paddle &p1Paddle, std::vector<Paddle> &p2Paddles, std::vector<PaddleBrain> &brains, float &dt )
+{
+    for ( auto i = 0; i < p2Paddles.size(); ++i )
+    {
+        auto own_delta = p2Paddles[i].velocity.y;
+        auto own_center = transpose( ( p2Paddles[i].position.y + p2Paddles[i].position.y + Constants::PaddleHeight ) / 2.0f, 50, 670, -1, 1);
+        auto x_delta =  transpose( p2Paddles[i].position.x - balls[i].position.x, 0, 1280, -1, 1 );
+        auto y1_delta = transpose( p2Paddles[i].position.y - ( balls[i].position.y + Constants::BallHeight ), -1280, 1165, -1, 1 );
+        auto y2_delta = transpose( ( p2Paddles[i].position.y + Constants::PaddleHeight ) - balls[i].position.y, -1280, 1165, -1, 1 ); 
+        
+        auto action = brains[i].Predict(std::vector<float> { own_center, x_delta, y1_delta, y2_delta });
+
+        p2Paddles[i].Update( action == Prediction::Up, action == Prediction::Down, dt );
+        balls[i].Update( p1Paddle, p2Paddles[i], dt );
+    }
+}
+
 void handleCollisionSounds(CollisionType &collisionType, Mix_Chunk* wallHitSound, Mix_Chunk* paddleHitSound)
 {
     if ( collisionType == CollisionType::Paddle ) { Mix_PlayChannel( -1, paddleHitSound, 0 ); }
@@ -86,9 +113,11 @@ void handleCollisionSounds(CollisionType &collisionType, Mix_Chunk* wallHitSound
 int main( int argc, char** argv )
 {
     bool train { false };
+    int numP2Paddles { 1 };
     if( argc > 1 && strcmp( argv[1], "train" ) == 0 )
     {
         train = true;
+        numP2Paddles = Constants::TrainingPaddles;
     }
     if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_AUDIO ) < 0 )
     {
@@ -144,7 +173,8 @@ int main( int argc, char** argv )
     );
     std::vector<Ball> balls;
     std::vector<Paddle> p2Paddles;
-    for ( int i = 0; i < Constants::TrainingPaddles; ++i )
+    std::vector<PaddleBrain> brains;
+    for ( int i = 0; i < numP2Paddles; ++i )
     {
         p2Paddles.push_back(
             Paddle(
@@ -163,6 +193,8 @@ int main( int argc, char** argv )
                 Constants::BallHeight
             )
         );
+
+        if ( train ) { brains.push_back( PaddleBrain( i ) ); }
     }
     
     PlayerScore p1Score( Vec2( Constants::WindowWidth / 4, 20 ), renderer, scoreFont );
@@ -171,6 +203,7 @@ int main( int argc, char** argv )
     bool buttons[4] = {};
     bool running = true;
     float dt = 0.0f;
+    std::cout << brains.size() << std::endl;
     while ( running )
     {
         auto startTime = std::chrono::high_resolution_clock::now();
@@ -178,9 +211,17 @@ int main( int argc, char** argv )
         SDL_Event event;
         handleEvents( event, running, buttons );
 
-        auto collistionType = updateAll( running, balls, p1Paddle, p2Paddles, p1Score, p2Score, buttons, dt );
+        CollisionType collisionType;
+        if ( train )
+        {
+            updateForTraining( running, balls, p1Paddle, p2Paddles, brains, dt );
+        }
+        else
+        {
+            collisionType = updateAll( running, balls, p1Paddle, p2Paddles, p1Score, p2Score, buttons, dt );
+            handleCollisionSounds( collisionType, wallHitSound, paddleHitSound );
+        }
         drawAll( renderer, net, balls, p1Paddle, p2Paddles, p1Score, p2Score );
-        handleCollisionSounds( collistionType, wallHitSound, paddleHitSound );
 
         auto stopTime = std::chrono::high_resolution_clock::now();
         dt = std::chrono::duration<float, std::chrono::milliseconds::period>(stopTime - startTime).count();

@@ -15,5 +15,5 @@ private:
     float Transpose(float value, float leftMin, float leftMax, float rightMin, float rightMax);
     
     Vec2 previousPosition;
-    PaddleBrain brain;
+    PaddleBrain brain { 1 };
 };
