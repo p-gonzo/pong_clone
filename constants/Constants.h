@@ -19,4 +19,6 @@ public:
     static constexpr auto PaddleSpeed { 1.0f };
 
     static constexpr auto WinningScore { 7 };
+
+    static constexpr auto TrainingPaddles { 1 };
 };

@@ -12,10 +12,8 @@
 #include "sprites/Net.h"
 #include "sprites/Paddle.h"
 #include "sprites/PlayerScore.h"
-#include "structs/Vec2.h"
 #include "structs/Rgba.h"
-
-#include "neural-network/AIPaddle.h"
+#include "structs/Vec2.h"
 
 void handleEvents( SDL_Event &event, bool &running, bool buttons[4] )
 {
@@ -40,15 +38,19 @@ void handleEvents( SDL_Event &event, bool &running, bool buttons[4] )
     }
 }
 
-void drawAll( SDL_Renderer* renderer, Net &net, Ball &ball, Paddle &p1Paddle, Paddle &p2Paddle, PlayerScore &p1Score, PlayerScore &p2Score )
+void drawAll( SDL_Renderer* renderer, Net &net, std::vector<Ball> &balls, Paddle &p1Paddle, std::vector<Paddle> &p2Paddles, PlayerScore &p1Score, PlayerScore &p2Score )
 {
     SDL_SetRenderDrawColor( renderer, 0x0, 0x0, 0x00, 0xFF );
     SDL_RenderClear( renderer );
     
     net.Draw( Rgba{ 0xFF, 0XFF, 0XFF, 0XFF } );
-    ball.Draw( Rgba{ 0xFF, 0XFF, 0XFF, 0XFF } );
     p1Paddle.Draw( Rgba{ 0x00, 0XFF, 0XFF, 0XFF } );
-    p2Paddle.Draw( Rgba{ 0xFF, 0X00, 0XFF, 0XFF } );
+    
+    for ( auto i = 0; i < p2Paddles.size(); ++ i)
+    {
+        p2Paddles[i].Draw( Rgba{ 0xFF, 0X00, 0XFF, 0XFF } );
+        balls[i].Draw( Rgba{ 0xFF, 0XFF, 0XFF, 0XFF } );
+    }
 
     p1Score.Draw( Rgba{ 0x00, 0XFF, 0XFF, 0XFF } );
     p2Score.Draw( Rgba{ 0xFF, 0X00, 0XFF, 0XFF } );
@@ -56,12 +58,16 @@ void drawAll( SDL_Renderer* renderer, Net &net, Ball &ball, Paddle &p1Paddle, Pa
     SDL_RenderPresent( renderer );
 }
 
-CollisionType updateAll ( bool &running, Ball &ball, Paddle &p1Paddle, Paddle &p2Paddle, PlayerScore &p1Score, PlayerScore &p2Score, bool buttons[4], float &dt )
+CollisionType updateAll ( bool &running, std::vector<Ball> &balls, Paddle &p1Paddle, std::vector<Paddle> &p2Paddles, PlayerScore &p1Score, PlayerScore &p2Score, bool buttons[4], float &dt )
 {
-    p1Paddle.Update( buttons[Buttons::p1PaddleUp], buttons[Buttons::p1PaddleDown], dt );
-    p2Paddle.Update( buttons[Buttons::p2PaddleUp], buttons[Buttons::p2PaddleDown], dt );
+    CollisionType collisionType { CollisionType::None };
 
-    auto collisionType = ball.Update( p1Paddle, p2Paddle, dt );
+    p1Paddle.Update( buttons[Buttons::p1PaddleUp], buttons[Buttons::p1PaddleDown], dt );
+    for ( auto i = 0; i < p2Paddles.size(); ++i )
+    {
+        p2Paddles[i].Update( buttons[Buttons::p2PaddleUp], buttons[Buttons::p2PaddleDown], dt );
+        collisionType = balls[i].Update( p1Paddle, p2Paddles[i], dt );
+    }
 
     if ( collisionType == CollisionType::Right ) { p1Score.Increment(); }
     if ( collisionType == CollisionType::Left ) { p2Score.Increment(); }
@@ -124,13 +130,6 @@ int main( int argc, char* args[] )
     Net& net { Net::GetInstance() };
     net.SetRenderer( renderer );
 
-    Ball ball(
-        Vec2( Constants::WindowWidth / 2.0f - Constants::BallHeight / 2.0f, Constants::WindowHeight / 2.0f - Constants::BallHeight / 2.0f ),
-        Vec2( Constants::BallSpeed, 0.0f ),
-        renderer,
-        Constants::BallHeight
-    );
-    
     Paddle p1Paddle(
         Vec2( Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ),
         Vec2( 0.0f, 0.0f ),
@@ -138,13 +137,28 @@ int main( int argc, char* args[] )
         Constants::PaddleHeight,
         Constants::PaddleWidth
     );
-    Paddle p2Paddle(
-        Vec2( Constants::WindowWidth - Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ),
-        Vec2 (0.0f, 0.0f ),
-        renderer,
-        Constants::PaddleHeight,
-        Constants::PaddleWidth
-    );
+    std::vector<Ball> balls;
+    std::vector<Paddle> p2Paddles;
+    for ( int i = 0; i < Constants::TrainingPaddles; ++i )
+    {
+        p2Paddles.push_back(
+            Paddle(
+                Vec2( Constants::WindowWidth - Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ),
+                Vec2 (0.0f, 0.0f ),
+                renderer,
+                Constants::PaddleHeight,
+                Constants::PaddleWidth
+            )
+        );
+        balls.push_back(
+            Ball(
+                Vec2( Constants::WindowWidth / 2.0f - Constants::BallHeight / 2.0f, Constants::WindowHeight / 2.0f - Constants::BallHeight / 2.0f ),
+                Vec2( Constants::BallSpeed, 0.0f ),
+                renderer,
+                Constants::BallHeight
+            )
+        );
+    }
     
     PlayerScore p1Score( Vec2( Constants::WindowWidth / 4, 20 ), renderer, scoreFont );
     PlayerScore p2Score( Vec2( 3 * Constants::WindowWidth / 4, 20 ), renderer, scoreFont );
@@ -159,8 +173,8 @@ int main( int argc, char* args[] )
         SDL_Event event;
         handleEvents( event, running, buttons );
 
-        auto collistionType = updateAll( running, ball, p1Paddle, p2Paddle, p1Score, p2Score, buttons, dt );
-        drawAll( renderer, net, ball, p1Paddle, p2Paddle, p1Score, p2Score );
+        auto collistionType = updateAll( running, balls, p1Paddle, p2Paddles, p1Score, p2Score, buttons, dt );
+        drawAll( renderer, net, balls, p1Paddle, p2Paddles, p1Score, p2Score );
         handleCollisionSounds( collistionType, wallHitSound, paddleHitSound );
 
         auto stopTime = std::chrono::high_resolution_clock::now();
