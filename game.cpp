@@ -40,22 +40,22 @@ void handleEvents( SDL_Event &event, bool &running, bool buttons[4] )
     }
 }
 
-void drawAll( SDL_Renderer* renderer, Net &net, std::vector<Ball> &balls, Paddle &p1Paddle, std::vector<Paddle> &p2Paddles, PlayerScore &p1Score, PlayerScore &p2Score )
+void drawAll( SDL_Renderer* renderer, Net &net, std::vector<Ball> &balls, Paddle &p1Paddle, std::vector<Paddle> &p2Paddles, PlayerScore &p1Score, PlayerScore &p2Score, std::vector<Rgba> &colors )
 {
     SDL_SetRenderDrawColor( renderer, 0x0, 0x0, 0x00, 0xFF );
     SDL_RenderClear( renderer );
     
     net.Draw( Rgba{ 0xFF, 0XFF, 0XFF, 0XFF } );
-    p1Paddle.Draw( Rgba{ 0x00, 0XFF, 0XFF, 0XFF } );
+    p1Paddle.Draw( Rgba{ 0xFF, 0xFF, 0xFF, 0x00 } );
     
     for ( auto i = 0; i < p2Paddles.size(); ++ i)
     {
-        p2Paddles[i].Draw( Rgba{ 0xFF, 0X00, 0XFF, 0XFF } );
-        balls[i].Draw( Rgba{ 0xFF, 0XFF, 0XFF, 0XFF } );
+        p2Paddles[i].Draw( colors[i] );
+        balls[i].Draw( colors[i] );
     }
 
-    p1Score.Draw( Rgba{ 0x00, 0XFF, 0XFF, 0XFF } );
-    p2Score.Draw( Rgba{ 0xFF, 0X00, 0XFF, 0XFF } );
+    p1Score.Draw( Rgba{ 0xFF, 0XFF, 0XFF, 0XFF } );
+    p2Score.Draw( Rgba{ 0xFF, 0XFF, 0XFF, 0XFF } );
 
     SDL_RenderPresent( renderer );
 }
@@ -100,7 +100,8 @@ void updateForTraining ( bool &running, std::vector<Ball> &balls, Paddle &p1Padd
         auto action = brains[i].Predict(std::vector<float> { own_center, x_delta, y1_delta, y2_delta });
 
         p2Paddles[i].Update( action == Prediction::Up, action == Prediction::Down, dt );
-        balls[i].Update( p1Paddle, p2Paddles[i], dt );
+        auto collistionType = balls[i].Update( p1Paddle, p2Paddles[i], dt );
+        // Todo - remove paddles that collide right
     }
 }
 
@@ -174,6 +175,7 @@ int main( int argc, char** argv )
     std::vector<Ball> balls;
     std::vector<Paddle> p2Paddles;
     std::vector<PaddleBrain> brains;
+    std::vector<Rgba> colors { Rgba { 0xFF, 0xFF, 0xFF, 0x00 } };
     for ( int i = 0; i < numP2Paddles; ++i )
     {
         p2Paddles.push_back(
@@ -194,7 +196,11 @@ int main( int argc, char** argv )
             )
         );
 
-        if ( train ) { brains.push_back( PaddleBrain( i ) ); }
+        if ( train )
+        {
+            brains.push_back( PaddleBrain( i ) );
+            colors.push_back ( Rgba( rand() % 256, rand() % 256, rand() % 256, 0x00 ) );
+        }
     }
     
     PlayerScore p1Score( Vec2( Constants::WindowWidth / 4, 20 ), renderer, scoreFont );
@@ -221,7 +227,7 @@ int main( int argc, char** argv )
             collisionType = updateAll( running, balls, p1Paddle, p2Paddles, p1Score, p2Score, buttons, dt );
             handleCollisionSounds( collisionType, wallHitSound, paddleHitSound );
         }
-        drawAll( renderer, net, balls, p1Paddle, p2Paddles, p1Score, p2Score );
+        drawAll( renderer, net, balls, p1Paddle, p2Paddles, p1Score, p2Score, colors );
 
         auto stopTime = std::chrono::high_resolution_clock::now();
         dt = std::chrono::duration<float, std::chrono::milliseconds::period>(stopTime - startTime).count();
