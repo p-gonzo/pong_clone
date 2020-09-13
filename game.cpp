@@ -83,8 +83,13 @@ void handleCollisionSounds(CollisionType &collisionType, Mix_Chunk* wallHitSound
     else if ( collisionType == CollisionType::Wall ) { Mix_PlayChannel( -1, wallHitSound, 0 ); }
 }
 
-int main( int argc, char* args[] )
+int main( int argc, char** argv )
 {
+    bool train { false };
+    if( argc > 1 && strcmp( argv[1], "train" ) == 0 )
+    {
+        train = true;
+    }
     if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_AUDIO ) < 0 )
     {
         std::cout <<  "SDL could not initialize! SDL_Error: " << SDL_GetError() << std::endl;
@@ -131,10 +136,10 @@ int main( int argc, char* args[] )
     net.SetRenderer( renderer );
 
     Paddle p1Paddle(
-        Vec2( Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ),
+        Vec2( Constants::PaddleGap, train ? 0 : Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ),
         Vec2( 0.0f, 0.0f ),
         renderer,
-        Constants::PaddleHeight,
+        train ? Constants::WindowHeight : Constants::PaddleHeight,
         Constants::PaddleWidth
     );
     std::vector<Ball> balls;

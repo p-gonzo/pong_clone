@@ -71,9 +71,9 @@ void Ball::HandlePaddleCollision( const Paddle &paddle, const float left, const 
 {
 
     float paddleLeft = paddle.position.x;
-    float paddleRight = paddle.position.x + Constants::PaddleWidth;
+    float paddleRight = paddle.position.x + paddle.rect.w;
     float paddleTop = paddle.position.y;
-    float paddleBottom = paddle.position.y + Constants::PaddleHeight;
+    float paddleBottom = paddle.position.y + paddle.rect.h;
 
     if ( left < paddleRight && right > paddleLeft && top < paddleBottom && bottom > paddleTop )
     {
