@@ -1,7 +1,6 @@
 #include <time.h>
 
 #include "PaddleBrain.h"
-#include <iostream>
 
 PaddleBrain::PaddleBrain( std::random_device &rd )
 {

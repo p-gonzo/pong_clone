@@ -1,6 +1,8 @@
 #include "Ball.h"
 #include "../constants/Constants.h"
 
+#include <iostream>
+
 Ball::Ball( Vec2 pos, Vec2 vel, SDL_Renderer* renderer, int diameter )
     :position( pos ), velocity ( vel ), renderer( renderer )
 {
@@ -82,7 +84,12 @@ void Ball::HandlePaddleCollision( const Paddle &paddle, const float left, const 
 
         float ballYCenter = ( top + bottom ) / 2;
         float paddleYCenter = ( paddleTop + paddleBottom ) / 2;
-        float ballPaddleYDelta = ballYCenter - paddleYCenter;
+
+
+        // Generate a random bounce for training
+        bool isWall = paddleBottom - paddleTop == Constants::WindowHeight;
+        float ballPaddleYDelta =  isWall ? rand() % ( Constants::WindowHeight * 2 ) - Constants::WindowHeight : ballYCenter - paddleYCenter;
+
         velocity.y = ( ballPaddleYDelta / ( 1 + ballPaddleYDelta ) ) * ( ballPaddleYDelta > 0 ? 1 : -1 );
         velocity.y *= Constants::BallXDeltaScalar;
 
