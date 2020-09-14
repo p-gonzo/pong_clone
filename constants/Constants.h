@@ -20,5 +20,5 @@ public:
 
     static constexpr auto WinningScore { 7 };
 
-    static constexpr auto TrainingPaddles { 30 };
+    static constexpr auto TrainingPaddles { 250 };
 };

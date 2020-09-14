@@ -1,5 +1,6 @@
 #include <iostream>
 #include <chrono>
+#include <random>
 #include <vector>
 
 #include <SDL2/SDL.h>
@@ -87,8 +88,9 @@ float transpose( float value, float leftMin, float leftMax, float rightMin, floa
     return rightMin + ( valueScaled * rightSpan );
 }
 
-void updateForTraining ( bool &running, std::vector<Ball> &balls, Paddle &p1Paddle, std::vector<Paddle> &p2Paddles, std::vector<PaddleBrain> &brains, float &dt )
+void updateForTraining ( bool &running, std::vector<Ball> &balls, Paddle &p1Paddle, std::vector<Paddle> &p2Paddles, std::vector<PaddleBrain> &brains, std::vector<Rgba> &colors, float &dt )
 {
+    std::vector<int> paddleIndexesToRemove;
     for ( auto i = 0; i < p2Paddles.size(); ++i )
     {
         auto own_delta = p2Paddles[i].velocity.y;
@@ -97,11 +99,20 @@ void updateForTraining ( bool &running, std::vector<Ball> &balls, Paddle &p1Padd
         auto y1_delta = transpose( p2Paddles[i].position.y - ( balls[i].position.y + Constants::BallHeight ), -1280, 1165, -1, 1 );
         auto y2_delta = transpose( ( p2Paddles[i].position.y + Constants::PaddleHeight ) - balls[i].position.y, -1280, 1165, -1, 1 ); 
         
-        auto action = brains[i].Predict(std::vector<float> { own_center, x_delta, y1_delta, y2_delta });
+        auto action = brains[i].Predict( std::vector<float> { own_center, x_delta, y1_delta, y2_delta } );
 
         p2Paddles[i].Update( action == Prediction::Up, action == Prediction::Down, dt );
         auto collistionType = balls[i].Update( p1Paddle, p2Paddles[i], dt );
-        // Todo - remove paddles that collide right
+        if ( collistionType == CollisionType::Right ) { std::cout << p2Paddles.size() << std::endl; paddleIndexesToRemove.push_back( i ); }
+    }
+    for ( auto i = 0; i < paddleIndexesToRemove.size(); ++i )
+    {
+        int idxToRemove = paddleIndexesToRemove[i] - i;
+        p2Paddles.erase( p2Paddles.begin() + idxToRemove );
+        balls.erase( balls.begin() + idxToRemove );
+        brains.erase( brains.begin() + idxToRemove );
+        colors.erase( colors.begin() + idxToRemove );
+        // std::cout << p2Paddles.size() << std::endl;
     }
 }
 
@@ -176,6 +187,7 @@ int main( int argc, char** argv )
     std::vector<Paddle> p2Paddles;
     std::vector<PaddleBrain> brains;
     std::vector<Rgba> colors { Rgba { 0xFF, 0xFF, 0xFF, 0x00 } };
+    std::random_device randomSeed;
     for ( int i = 0; i < numP2Paddles; ++i )
     {
         p2Paddles.push_back(
@@ -198,7 +210,7 @@ int main( int argc, char** argv )
 
         if ( train )
         {
-            brains.push_back( PaddleBrain( i ) );
+            brains.push_back( PaddleBrain( randomSeed ) );
             colors.push_back ( Rgba( rand() % 256, rand() % 256, rand() % 256, 0x00 ) );
         }
     }
@@ -220,7 +232,7 @@ int main( int argc, char** argv )
         CollisionType collisionType;
         if ( train )
         {
-            updateForTraining( running, balls, p1Paddle, p2Paddles, brains, dt );
+            updateForTraining( running, balls, p1Paddle, p2Paddles, brains, colors, dt );
         }
         else
         {

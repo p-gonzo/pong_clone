@@ -12,9 +12,9 @@ class PaddleBrain
 {
 public:
 
-    PaddleBrain( const int i );
+    PaddleBrain( std::random_device &rd );
     Prediction Predict(Vector<float> inputLayer);
-    std::default_random_engine generator;
+    std::mt19937 generator;
 
 private:
     Vector<float> GenerateRandomNormalDist(const int size);

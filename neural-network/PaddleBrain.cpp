@@ -2,9 +2,9 @@
 
 #include "PaddleBrain.h"
 
-PaddleBrain::PaddleBrain( const int i )
+PaddleBrain::PaddleBrain( std::random_device &rd )
 {
-    generator.seed( i );
+    generator.seed(rd());
 }
 
 Prediction PaddleBrain::Predict(Vector<float> inputLayer)
