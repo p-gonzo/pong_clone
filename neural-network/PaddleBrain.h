@@ -24,5 +24,9 @@ private:
     void ReLUActivation( Vector<float> &vec );
     void Softmax( Vector<float> &vec );
 
+    Matrix<float> _denseLayerWeights;
+    Vector<float> _denseLayerBiases;
+    Matrix<float> _outputLayerWeights;
+    Vector<float> _outputLayerBiases;
 
 };

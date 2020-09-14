@@ -1,27 +1,29 @@
 #include <time.h>
 
 #include "PaddleBrain.h"
+#include <iostream>
 
 PaddleBrain::PaddleBrain( std::random_device &rd )
 {
     generator.seed(rd());
+    
+    _denseLayerWeights = GenerateRandomNormalDist( 4, 8 );
+    _denseLayerBiases = Vector<float>( 8, 0.0f );
+    _outputLayerWeights = GenerateRandomNormalDist( 8, 3 );
+    _outputLayerBiases = Vector<float>( 3, 0.0f );
 }
 
 Prediction PaddleBrain::Predict(Vector<float> inputLayer)
 {
-    Matrix<float> denseLayerWeights = GenerateRandomNormalDist( inputLayer.size(), 8 );
-    Vector<float> denseLayerBiases( 8, 0.0f );
-    Matrix<float> outputLayerWeights = GenerateRandomNormalDist( 8, 3 );
-    Vector<float> outputLayerBiases( 3, 0.0f );
 
-    Vector<float> denseLayer = Sum( DotProduct( inputLayer, denseLayerWeights ), denseLayerBiases );
+    Vector<float> denseLayer = Sum( DotProduct( inputLayer, _denseLayerWeights ), _denseLayerBiases );
     ReLUActivation(denseLayer);
 
-    Vector<float> outputLayer = Sum( DotProduct( denseLayer, outputLayerWeights ), outputLayerBiases );
+    Vector<float> outputLayer = Sum( DotProduct( denseLayer, _outputLayerWeights ), _outputLayerBiases );
     Softmax( outputLayer );
 
-    if ( outputLayer[0] > 0.5 ) { return Prediction::Up; }
-    else if ( outputLayer[2] > 0.5 ) { return Prediction::Down; }
+    if ( outputLayer[0] > 0.33 ) { return Prediction::Up; }
+    else if ( outputLayer[2] > 0.33 ) { return Prediction::Down; }
     else return Prediction::Stay;
 }
 
