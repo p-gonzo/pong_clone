@@ -88,7 +88,19 @@ float transpose( float value, float leftMin, float leftMax, float rightMin, floa
     return rightMin + ( valueScaled * rightSpan );
 }
 
-void updateForTraining ( bool &running, std::vector<Ball> &balls, Paddle &p1Paddle, std::vector<Paddle> &p2Paddles, std::vector<PaddleBrain> &brains, std::vector<Rgba> &colors, float &dt )
+void generateNextBrainGeneration( std::vector<PaddleBrain> &brains )
+{
+    std::random_device randomSeed;
+    auto targetBrain = brains[0];
+
+    for ( auto i = 0; i < Constants::TrainingPaddles; ++i )
+    {
+        brains.push_back( PaddleBrain( randomSeed ) );
+    }
+
+}
+
+void updateForTraining ( bool &running, std::vector<Ball> &balls, Paddle &p1Paddle, std::vector<Paddle> &p2Paddles, std::vector<PaddleBrain> &brains, std::vector<Rgba> &colors, float &dt, SDL_Renderer* renderer)
 {
     std::vector<int> paddleIndexesToRemove;
     for ( auto i = 0; i < p2Paddles.size(); ++i )
@@ -103,7 +115,7 @@ void updateForTraining ( bool &running, std::vector<Ball> &balls, Paddle &p1Padd
 
         p2Paddles[i].Update( action == Prediction::Up, action == Prediction::Down, dt );
         auto collistionType = balls[i].Update( p1Paddle, p2Paddles[i], dt );
-        if ( collistionType == CollisionType::Right ) { std::cout << p2Paddles.size() << std::endl; paddleIndexesToRemove.push_back( i ); }
+        if ( collistionType == CollisionType::Right ) { paddleIndexesToRemove.push_back( i ); }
     }
     for ( auto i = 0; i < paddleIndexesToRemove.size(); ++i )
     {
@@ -112,7 +124,36 @@ void updateForTraining ( bool &running, std::vector<Ball> &balls, Paddle &p1Padd
         balls.erase( balls.begin() + idxToRemove );
         brains.erase( brains.begin() + idxToRemove );
         colors.erase( colors.begin() + idxToRemove );
-        // std::cout << p2Paddles.size() << std::endl;
+        if ( brains.size() == 1 )
+        {
+            generateNextBrainGeneration( brains );
+            return;
+        }
+    }
+    if ( p2Paddles.size() == 0 )
+    {
+        for ( auto i = 0; i < Constants::TrainingPaddles; ++i )
+        {
+                    p2Paddles.push_back(
+            Paddle(
+                Vec2( Constants::WindowWidth - Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ),
+                Vec2 (0.0f, 0.0f ),
+                renderer,
+                Constants::PaddleHeight,
+                Constants::PaddleWidth
+            )
+        );
+        balls.push_back(
+            Ball(
+                Vec2( Constants::WindowWidth / 2.0f - Constants::BallHeight / 2.0f, Constants::WindowHeight / 2.0f - Constants::BallHeight / 2.0f ),
+                Vec2( Constants::BallSpeed, 0.0f ),
+                renderer,
+                Constants::BallHeight
+            )
+        );
+        colors.push_back ( Rgba( rand() % 256, rand() % 256, rand() % 256, 0x00 ) );
+        }
+        std::cout << "Spawn next gen" << std::endl;
     }
 }
 
@@ -232,7 +273,7 @@ int main( int argc, char** argv )
         CollisionType collisionType;
         if ( train )
         {
-            updateForTraining( running, balls, p1Paddle, p2Paddles, brains, colors, dt );
+            updateForTraining( running, balls, p1Paddle, p2Paddles, brains, colors, dt, renderer );
         }
         else
         {
