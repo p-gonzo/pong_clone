@@ -95,7 +95,7 @@ void generateNextBrainGeneration( std::vector<PaddleBrain> &brains )
 
     for ( auto i = 0; i < Constants::TrainingPaddles; ++i )
     {
-        brains.emplace_back( PaddleBrain( parentBrain, randomSeed ) );
+        brains.emplace_back( PaddleBrain( parentBrain, randomSeed, 0.1f, 0.25f ) );
     }
 
 }
@@ -133,24 +133,24 @@ void updateForTraining ( bool &running, std::vector<Ball> &balls, Paddle &p1Padd
     {
         for ( auto i = 0; i < Constants::TrainingPaddles; ++i )
         {
-                    p2Paddles.emplace_back(
-            Paddle(
-                Vec2( Constants::WindowWidth - Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ),
-                Vec2 (0.0f, 0.0f ),
-                renderer,
-                Constants::PaddleHeight,
-                Constants::PaddleWidth
-            )
-        );
-        balls.emplace_back(
-            Ball(
-                Vec2( Constants::WindowWidth / 2.0f - Constants::BallHeight / 2.0f, Constants::WindowHeight / 2.0f - Constants::BallHeight / 2.0f ),
-                Vec2( Constants::BallSpeed, 0.0f ),
-                renderer,
-                Constants::BallHeight
-            )
-        );
-        colors.emplace_back ( Rgba( rand() % 256, rand() % 256, rand() % 256, 0x00 ) );
+            p2Paddles.emplace_back(
+                Paddle(
+                    Vec2( Constants::WindowWidth - Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ),
+                    Vec2 (0.0f, 0.0f ),
+                    renderer,
+                    Constants::PaddleHeight,
+                    Constants::PaddleWidth
+                )
+            );
+            balls.emplace_back(
+                Ball(
+                    Vec2( Constants::WindowWidth / 2.0f - Constants::BallHeight / 2.0f, Constants::WindowHeight / 2.0f - Constants::BallHeight / 2.0f ),
+                    Vec2( Constants::BallSpeed, 0.0f ),
+                    renderer,
+                    Constants::BallHeight
+                )
+            );
+            colors.emplace_back ( Rgba( rand() % 256, rand() % 256, rand() % 256, 0x00 ) );
         }
         std::cout << "Spawn next gen" << std::endl;
     }

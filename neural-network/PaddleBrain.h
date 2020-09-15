@@ -13,7 +13,7 @@ class PaddleBrain
 public:
 
     PaddleBrain( std::random_device &rd );
-    PaddleBrain( const PaddleBrain &parent, std::random_device &rd );
+    PaddleBrain( const PaddleBrain &parent, std::random_device &rd, const float mutationRate, const float standardDeviation );
     Prediction Predict(Vector<float> inputLayer);
 
 private:
@@ -25,8 +25,8 @@ private:
     void ReLUActivation( Vector<float> &vec );
     void Softmax( Vector<float> &vec );
 
-    Matrix<float> GenerateMutatedMatrix( const Matrix<float> &weights );
-    Vector<float> GenerateMutatedVector( const Vector<float> &biases );
+    Matrix<float> GenerateMutatedMatrix( const Matrix<float> &weights, const float mutationRate, const float standardDeviation );
+    Vector<float> GenerateMutatedVector( const Vector<float> &biases, const float mutationRate, const float standardDeviation );
 
     std::mt19937 _generator;
 

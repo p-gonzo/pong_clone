@@ -12,14 +12,14 @@ PaddleBrain::PaddleBrain( std::random_device &rd )
     _outputLayerBiases = Vector<float>( 3, 0.0f );
 }
 
-PaddleBrain::PaddleBrain( const PaddleBrain &parent, std::random_device &rd )
+PaddleBrain::PaddleBrain(  const PaddleBrain &parent, std::random_device &rd, const float mutationRate, const float standardDeviation )
 {
     _generator.seed(rd());
 
-    _denseLayerWeights = GenerateMutatedMatrix( parent._denseLayerWeights );
-    _denseLayerBiases = GenerateMutatedVector( parent._denseLayerBiases );
-    _outputLayerWeights = GenerateMutatedMatrix (parent._outputLayerWeights );
-    _outputLayerBiases = GenerateMutatedVector (parent._outputLayerBiases );
+    _denseLayerWeights = GenerateMutatedMatrix( parent._denseLayerWeights, mutationRate, standardDeviation );
+    _denseLayerBiases = GenerateMutatedVector( parent._denseLayerBiases, mutationRate, standardDeviation );
+    _outputLayerWeights = GenerateMutatedMatrix (parent._outputLayerWeights, mutationRate, standardDeviation );
+    _outputLayerBiases = GenerateMutatedVector (parent._outputLayerBiases, mutationRate, standardDeviation );
 }
 
 Prediction PaddleBrain::Predict(Vector<float> inputLayer)
@@ -99,25 +99,26 @@ void PaddleBrain::Softmax( Vector<float> &vec )
     }
 }
 
-Matrix<float> PaddleBrain::GenerateMutatedMatrix( const Matrix<float> &weights )
+Matrix<float> PaddleBrain::GenerateMutatedMatrix( const Matrix<float> &weights, const float mutationRate, const float standardDeviation )
 {   
     Matrix<float> newWeights;
     for ( auto i = 0; i < weights.size(); ++i )
     {
-        newWeights.emplace_back( GenerateMutatedVector( weights[i] ) );
+        newWeights.emplace_back( GenerateMutatedVector( weights[i], mutationRate, standardDeviation ) );
     }
     return newWeights;
 }
 
-Vector<float> PaddleBrain::GenerateMutatedVector( const Vector<float> &biases )
+Vector<float> PaddleBrain::GenerateMutatedVector( const Vector<float> &biases, const float mutationRate, const float standardDeviation )
 {
     Vector<float> newBiases;
-    std::normal_distribution<float> distribution( 0.0f, 0.25f );
-    int rollTen = rand() % 11;
-    std::cout << rollTen << std::endl;
+    std::normal_distribution<float> distribution( 0.0f, standardDeviation );
+    
     for ( auto i = 0; i < biases.size(); ++i )
     {
-        if ( rollTen > 8 )
+        bool shouldMutate = rand() % 11 > ( 10 - ( mutationRate * 10 ) );
+        std::cout << shouldMutate << std::endl;
+        if ( shouldMutate )
         {
             newBiases.emplace_back( biases[i] + distribution( _generator ) );
         }
