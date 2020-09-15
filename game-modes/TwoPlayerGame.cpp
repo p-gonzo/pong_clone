@@ -1,5 +1,7 @@
 #include "TwoPlayerGame.h"
 
+#include <iostream>
+
 #include "../constants/Constants.h"
 #include "../structs/Vec2.h"
 
@@ -28,13 +30,14 @@ TwoPlayerGame::TwoPlayerGame()
     , _p1Score( Vec2( Constants::WindowWidth / 4, 20 ), _renderer, _scoreFont )
     , _p2Score( Vec2( 3 * Constants::WindowWidth / 4, 20 ), _renderer, _scoreFont )
 {
-    _net.SetRenderer( _renderer );
+
 }
 
 void TwoPlayerGame::HandleEvents()
 {
     while ( SDL_PollEvent( &_event ) )
     {
+        std::cout << _event.key.keysym.sym << std::endl;
         if ( _event.type == SDL_QUIT ) _running = false;
         else if ( _event.type == SDL_KEYDOWN )
         {
@@ -65,11 +68,6 @@ void TwoPlayerGame::UpdateAll()
     if ( _p1Score.value == Constants::WinningScore || _p2Score.value == Constants::WinningScore ) { _running = false; }
 }
 
-void TwoPlayerGame::HandleSounds()
-{
-    if ( _collisionType == CollisionType::Paddle ) { Mix_PlayChannel( -1, _paddleHitSound, 0 ); }
-    else if ( _collisionType == CollisionType::Wall ) { Mix_PlayChannel( -1, _wallHitSound, 0 ); }
-}
 
 void TwoPlayerGame::DrawAll()
 {

@@ -49,6 +49,8 @@ GameLoop::GameLoop()
         std::cout <<  "Mixer could not load paddle hit! TTF_Error: " << TTF_GetError() << std::endl;
         throw std::exception();;
     }
+    
+    _net.SetRenderer( _renderer );
 }
 
 GameLoop::~GameLoop()
@@ -75,4 +77,10 @@ void GameLoop::Run()
         auto stopTime = std::chrono::high_resolution_clock::now();
         _dt = std::chrono::duration<float, std::chrono::milliseconds::period>(stopTime - startTime).count();
     }
+}
+
+void GameLoop::HandleSounds()
+{
+    if ( _collisionType == CollisionType::Paddle ) { Mix_PlayChannel( -1, _paddleHitSound, 0 ); }
+    else if ( _collisionType == CollisionType::Wall ) { Mix_PlayChannel( -1, _wallHitSound, 0 ); }
 }

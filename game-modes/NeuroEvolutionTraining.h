@@ -4,8 +4,8 @@
 
 #include "GameLoop.h"
 
+#include "../constants/Constants.h"
 #include "../sprites/Ball.h"
-#include "../sprites/Net.h"
 #include "../sprites/Paddle.h"
 #include "../sprites/PlayerScore.h"
 #include "../structs/Rgba.h"
@@ -21,17 +21,23 @@ protected:
 
 virtual void HandleEvents();
 virtual void UpdateAll();
-virtual void HandleSounds();
 virtual void DrawAll();
 
-    std::vector<Ball> _balls;
     Paddle _randomWall;
-    std::vector<Paddle> _p2Paddles;
     PlayerScore _generations;
     PlayerScore _hits;
-    std::vector<PaddleBrain> _brains;
-    std::vector<Rgba> _colors;
-    Net &_net { Net::GetInstance() };
 
-    std::random_device randomSeed;
+    std::vector<Ball> _balls;
+    std::vector<Paddle> _paddles;
+    std::vector<Rgba> _colors;
+    std::vector<PaddleBrain> _brains;
+
+    std::random_device _randomSeed;
+
+    const int _numberOfPaddles = Constants::TrainingPaddles;
+
+private:
+    float Transpose( float value, float leftMin, float leftMax, float rightMin, float rightMax ) const;
+    void CloneAndMutatePaddleBrain();
+    void PushPaddlesBallsAndColors();
 };

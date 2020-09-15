@@ -5,6 +5,7 @@
 #include <SDL2/SDL_mixer.h>
 
 #include "../constants/Enums.h"
+#include "../sprites/Net.h"
 
 class GameLoop
 {
@@ -17,8 +18,9 @@ public:
 protected:
     virtual void HandleEvents() = 0;
     virtual void UpdateAll() = 0;
-    virtual void HandleSounds() = 0;
     virtual void DrawAll() = 0;
+
+    void HandleSounds();
 
     SDL_Window* _window;
     SDL_Renderer* _renderer;
@@ -28,6 +30,8 @@ protected:
 
     SDL_Event _event;
     CollisionType _collisionType;
+
+    Net &_net { Net::GetInstance() };
 
     bool _running { true };
     float _dt { 0.0f };
