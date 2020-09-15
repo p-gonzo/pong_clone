@@ -1,1 +1,1 @@
-make all && build/Pong
+make all && build/Pong train

@@ -91,11 +91,11 @@ float transpose( float value, float leftMin, float leftMax, float rightMin, floa
 void generateNextBrainGeneration( std::vector<PaddleBrain> &brains )
 {
     std::random_device randomSeed;
-    auto targetBrain = brains[0];
+    auto parentBrain = brains[0];
 
     for ( auto i = 0; i < Constants::TrainingPaddles; ++i )
     {
-        brains.push_back( PaddleBrain( randomSeed ) );
+        brains.emplace_back( PaddleBrain( parentBrain, randomSeed ) );
     }
 
 }
@@ -105,17 +105,16 @@ void updateForTraining ( bool &running, std::vector<Ball> &balls, Paddle &p1Padd
     std::vector<int> paddleIndexesToRemove;
     for ( auto i = 0; i < p2Paddles.size(); ++i )
     {
-        auto own_delta = p2Paddles[i].velocity.y;
         auto own_center = transpose( ( p2Paddles[i].position.y + p2Paddles[i].position.y + Constants::PaddleHeight ) / 2.0f, 50, 670, -1, 1);
-        auto x_delta =  transpose( p2Paddles[i].position.x - balls[i].position.x, 0, 1280, -1, 1 );
-        auto y1_delta = transpose( p2Paddles[i].position.y - ( balls[i].position.y + Constants::BallHeight ), -1280, 1165, -1, 1 );
-        auto y2_delta = transpose( ( p2Paddles[i].position.y + Constants::PaddleHeight ) - balls[i].position.y, -1280, 1165, -1, 1 ); 
+        auto x_delta =  transpose( p2Paddles[i].position.x - balls[i].position.x, 0, 1205, -1, 1 );
+        auto y1_delta = transpose( p2Paddles[i].position.y - ( balls[i].position.y + Constants::BallHeight ), -720, 605, -1, 1 );
+        auto y2_delta = transpose( ( p2Paddles[i].position.y + Constants::PaddleHeight ) - balls[i].position.y, -605, 720, -1, 1 ); 
         
-        auto action = brains[i].Predict( std::vector<float> { own_center, x_delta, y1_delta, y2_delta } );
+        auto action = brains[i].Predict( std::vector<float> { x_delta, y1_delta, y2_delta } );
 
         p2Paddles[i].Update( action == Prediction::Up, action == Prediction::Down, dt );
         auto collistionType = balls[i].Update( p1Paddle, p2Paddles[i], dt );
-        if ( collistionType == CollisionType::Right ) { paddleIndexesToRemove.push_back( i ); }
+        if ( collistionType == CollisionType::Right ) { paddleIndexesToRemove.emplace_back( i ); }
     }
     for ( auto i = 0; i < paddleIndexesToRemove.size(); ++i )
     {
@@ -134,7 +133,7 @@ void updateForTraining ( bool &running, std::vector<Ball> &balls, Paddle &p1Padd
     {
         for ( auto i = 0; i < Constants::TrainingPaddles; ++i )
         {
-                    p2Paddles.push_back(
+                    p2Paddles.emplace_back(
             Paddle(
                 Vec2( Constants::WindowWidth - Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ),
                 Vec2 (0.0f, 0.0f ),
@@ -143,7 +142,7 @@ void updateForTraining ( bool &running, std::vector<Ball> &balls, Paddle &p1Padd
                 Constants::PaddleWidth
             )
         );
-        balls.push_back(
+        balls.emplace_back(
             Ball(
                 Vec2( Constants::WindowWidth / 2.0f - Constants::BallHeight / 2.0f, Constants::WindowHeight / 2.0f - Constants::BallHeight / 2.0f ),
                 Vec2( Constants::BallSpeed, 0.0f ),
@@ -151,7 +150,7 @@ void updateForTraining ( bool &running, std::vector<Ball> &balls, Paddle &p1Padd
                 Constants::BallHeight
             )
         );
-        colors.push_back ( Rgba( rand() % 256, rand() % 256, rand() % 256, 0x00 ) );
+        colors.emplace_back ( Rgba( rand() % 256, rand() % 256, rand() % 256, 0x00 ) );
         }
         std::cout << "Spawn next gen" << std::endl;
     }
@@ -228,10 +227,14 @@ int main( int argc, char** argv )
     std::vector<Paddle> p2Paddles;
     std::vector<PaddleBrain> brains;
     std::vector<Rgba> colors { Rgba { 0xFF, 0xFF, 0xFF, 0x00 } };
+    balls.reserve( numP2Paddles + 1 );
+    p2Paddles.reserve( numP2Paddles + 1 );
+    brains.reserve( numP2Paddles + 1 );
+    colors.reserve( numP2Paddles + 1 );
     std::random_device randomSeed;
     for ( int i = 0; i < numP2Paddles; ++i )
     {
-        p2Paddles.push_back(
+        p2Paddles.emplace_back(
             Paddle(
                 Vec2( Constants::WindowWidth - Constants::PaddleGap, Constants::WindowHeight / 2.0f - Constants::PaddleHeight / 2.0f ),
                 Vec2 (0.0f, 0.0f ),
@@ -240,7 +243,7 @@ int main( int argc, char** argv )
                 Constants::PaddleWidth
             )
         );
-        balls.push_back(
+        balls.emplace_back(
             Ball(
                 Vec2( Constants::WindowWidth / 2.0f - Constants::BallHeight / 2.0f, Constants::WindowHeight / 2.0f - Constants::BallHeight / 2.0f ),
                 Vec2( Constants::BallSpeed, 0.0f ),
@@ -251,8 +254,8 @@ int main( int argc, char** argv )
 
         if ( train )
         {
-            brains.push_back( PaddleBrain( randomSeed ) );
-            colors.push_back ( Rgba( rand() % 256, rand() % 256, rand() % 256, 0x00 ) );
+            brains.emplace_back( PaddleBrain( randomSeed ) );
+            colors.emplace_back ( Rgba( rand() % 256, rand() % 256, rand() % 256, 0x00 ) );
         }
     }
     
@@ -262,7 +265,6 @@ int main( int argc, char** argv )
     bool buttons[4] = {};
     bool running = true;
     float dt = 0.0f;
-    std::cout << brains.size() << std::endl;
     while ( running )
     {
         auto startTime = std::chrono::high_resolution_clock::now();

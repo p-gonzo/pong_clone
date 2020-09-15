@@ -1,15 +1,25 @@
 #include <time.h>
-
+#include <iostream>
 #include "PaddleBrain.h"
 
 PaddleBrain::PaddleBrain( std::random_device &rd )
 {
-    generator.seed(rd());
+    _generator.seed(rd());
     
-    _denseLayerWeights = GenerateRandomNormalDist( 4, 8 );
+    _denseLayerWeights = GenerateRandomNormalDist( 3, 8 );
     _denseLayerBiases = Vector<float>( 8, 0.0f );
     _outputLayerWeights = GenerateRandomNormalDist( 8, 3 );
     _outputLayerBiases = Vector<float>( 3, 0.0f );
+}
+
+PaddleBrain::PaddleBrain( const PaddleBrain &parent, std::random_device &rd )
+{
+    _generator.seed(rd());
+
+    _denseLayerWeights = GenerateMutatedMatrix( parent._denseLayerWeights );
+    _denseLayerBiases = GenerateMutatedVector( parent._denseLayerBiases );
+    _outputLayerWeights = GenerateMutatedMatrix (parent._outputLayerWeights );
+    _outputLayerBiases = GenerateMutatedVector (parent._outputLayerBiases );
 }
 
 Prediction PaddleBrain::Predict(Vector<float> inputLayer)
@@ -29,11 +39,11 @@ Prediction PaddleBrain::Predict(Vector<float> inputLayer)
 Vector<float> PaddleBrain::GenerateRandomNormalDist(const int size)
 {
     Vector<float> vec;
-    std::normal_distribution<float>distribution( 0.0f, 0.75f );
+    std::normal_distribution<float> distribution( 0.0f, 0.75f );
 
     for ( int i = 0; i < size; ++i )
     {
-        vec.push_back( distribution( generator ) );
+        vec.push_back( distribution( _generator ) );
     }
     return vec;
 }
@@ -87,4 +97,34 @@ void PaddleBrain::Softmax( Vector<float> &vec )
     {
         vec[i] = exp(vec[i]) / eularSum;
     }
+}
+
+Matrix<float> PaddleBrain::GenerateMutatedMatrix( const Matrix<float> &weights )
+{   
+    Matrix<float> newWeights;
+    for ( auto i = 0; i < weights.size(); ++i )
+    {
+        newWeights.emplace_back( GenerateMutatedVector( weights[i] ) );
+    }
+    return newWeights;
+}
+
+Vector<float> PaddleBrain::GenerateMutatedVector( const Vector<float> &biases )
+{
+    Vector<float> newBiases;
+    std::normal_distribution<float> distribution( 0.0f, 0.25f );
+    int rollTen = rand() % 11;
+    std::cout << rollTen << std::endl;
+    for ( auto i = 0; i < biases.size(); ++i )
+    {
+        if ( rollTen > 8 )
+        {
+            newBiases.emplace_back( biases[i] + distribution( _generator ) );
+        }
+        else
+        {
+            newBiases.emplace_back( biases[i] );
+        }
+    }
+    return newBiases;
 }
