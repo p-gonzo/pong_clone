@@ -84,7 +84,8 @@ void GameLoop::Run()
 
 void GameLoop::HandleSounds()
 {
-    if ( _collisionType == CollisionType::Paddle ) { Mix_PlayChannel( -1, _paddleHitSound, 0 ); }
+    if ( _collisionType == CollisionType::P1Paddle ) { Mix_PlayChannel( -1, _paddleHitSound, 0 ); }
+    else if ( _collisionType == CollisionType::P2Paddle ) { Mix_PlayChannel( -1, _paddleHitSound, 0 ); }
     else if ( _collisionType == CollisionType::Wall ) { Mix_PlayChannel( -1, _wallHitSound, 0 ); }
 }
 

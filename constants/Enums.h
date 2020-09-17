@@ -8,11 +8,12 @@ enum Buttons
     p2PaddleDown
 };
 
-enum class CollisionType
+enum CollisionType
 {
-    None    = (1u << 0),
-    Paddle  = (1u << 1),
-    Wall    = (1u << 2),
-    Left    = (1u << 3),
-    Right   = (1u << 4)
+    None        = (1u << 0),
+    P1Paddle    = (1u << 1),
+    P2Paddle    = (1u << 2),
+    Wall        = (1u << 3),
+    Left        = (1u << 4),
+    Right       = (1u << 5)
 };

@@ -94,6 +94,6 @@ void Ball::HandlePaddleCollision( const Paddle &paddle, const float left, const 
         velocity.y *= Constants::BallXDeltaScalar;
 
         velocity.x = -velocity.x;
-        _collision =  CollisionType::Paddle;
+        _collision =  velocity.x > 0 ? CollisionType::P1Paddle : CollisionType::P2Paddle;
     }
 }

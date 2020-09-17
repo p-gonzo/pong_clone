@@ -37,6 +37,7 @@ void NeuroEvolutionTraining::HandleGameEvents()
 void NeuroEvolutionTraining::UpdateAll()
 {
     std::vector<int> paddleIndexesToRemove;
+    unsigned int allCollisions = 0;
     for ( auto i = 0; i < _paddles.size(); ++i )
     {
         auto x_delta =  Transpose( _paddles[i].position.x - _balls[i].position.x, 0, 1205, -1, 1 );
@@ -47,8 +48,16 @@ void NeuroEvolutionTraining::UpdateAll()
 
         _paddles[i].Update( action == Prediction::Up, action == Prediction::Down, _dt );
         auto collistionType = _balls[i].Update( _randomWall, _paddles[i], _dt );
+        
+        allCollisions |= collistionType ;
         if ( collistionType == CollisionType::Right ) { paddleIndexesToRemove.emplace_back( i ); }
     }
+    
+    _collisionType = CollisionType::None;
+    if ( CollisionType::P2Paddle & allCollisions ) { _hits.Increment(); _collisionType = CollisionType::P2Paddle; }
+    else if ( CollisionType::P1Paddle & allCollisions ) { _collisionType = CollisionType::P1Paddle; }
+    else if ( CollisionType::Wall & allCollisions ) { _collisionType = CollisionType::Wall; }
+    
     for ( auto i = 0; i < paddleIndexesToRemove.size(); ++i )
     {
         int idxToRemove = paddleIndexesToRemove[i] - i;
@@ -65,6 +74,7 @@ void NeuroEvolutionTraining::UpdateAll()
     if ( _paddles.size() == 0 )
     {
         _generations.Increment();
+        _hits.Clear();
         for ( auto i = 0; i < _numberOfPaddles; ++i ) { PushPaddlesBallsAndColors(); }
     }
 }
