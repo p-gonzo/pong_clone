@@ -71,11 +71,14 @@ void GameLoop::Run()
     {
         auto startTime = std::chrono::high_resolution_clock::now();
         HandleEvents();
-        UpdateAll();
-        HandleSounds();
-        DrawAll();
+        if (!_paused )
+        {
+            UpdateAll();
+            HandleSounds();
+            DrawAll();
+        }
         auto stopTime = std::chrono::high_resolution_clock::now();
-        _dt = std::chrono::duration<float, std::chrono::milliseconds::period>(stopTime - startTime).count();
+        _dt = std::chrono::duration<float, std::chrono::milliseconds::period>( stopTime - startTime ).count();
     }
 }
 
@@ -83,4 +86,15 @@ void GameLoop::HandleSounds()
 {
     if ( _collisionType == CollisionType::Paddle ) { Mix_PlayChannel( -1, _paddleHitSound, 0 ); }
     else if ( _collisionType == CollisionType::Wall ) { Mix_PlayChannel( -1, _wallHitSound, 0 ); }
+}
+
+void GameLoop::HandleEvents()
+{
+    while ( SDL_PollEvent( &_event ) )
+    {
+        if ( _event.type == SDL_QUIT ) { _running = false; }
+        else if ( _event.type == SDL_KEYDOWN &&  _event.key.keysym.sym == SDLK_ESCAPE ) { _running = false; }
+        else if ( _event.type == SDL_KEYDOWN &&  _event.key.keysym.sym == SDLK_p ) { _paused = !_paused; }
+        else { HandleGameEvents(); }
+    }
 }

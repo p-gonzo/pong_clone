@@ -16,11 +16,12 @@ public:
     virtual ~GameLoop();
 
 protected:
-    virtual void HandleEvents() = 0;
+    virtual void HandleGameEvents() = 0;
     virtual void UpdateAll() = 0;
     virtual void DrawAll() = 0;
 
     void HandleSounds();
+    void HandleEvents();
 
     SDL_Window* _window;
     SDL_Renderer* _renderer;
@@ -34,5 +35,6 @@ protected:
     Net &_net { Net::GetInstance() };
 
     bool _running { true };
+    bool _paused { false };
     float _dt { 0.0f };
 };

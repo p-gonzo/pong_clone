@@ -11,8 +11,8 @@ NeuroEvolutionTraining::NeuroEvolutionTraining()
         Constants::WindowHeight,
         Constants::PaddleWidth
     )
-    , _generations( Vec2( Constants::WindowWidth / 4, 20 ), _renderer, _scoreFont )
-    , _hits( Vec2( 3 * Constants::WindowWidth / 4, 20 ), _renderer, _scoreFont )
+    , _generations( Vec2( Constants::WindowWidth / 4, 20 ), _renderer, _scoreFont, "Gen:" )
+    , _hits( Vec2( 3 * Constants::WindowWidth / 4, 20 ), _renderer, _scoreFont, "Hit:" )
 
 {
     _balls.reserve( _numberOfPaddles + 1 );
@@ -25,15 +25,13 @@ NeuroEvolutionTraining::NeuroEvolutionTraining()
         PushPaddlesBallsAndColors();
         _brains.emplace_back( PaddleBrain( _randomSeed ) );
     }
+    _generations.Increment();
 }
 
-void NeuroEvolutionTraining::HandleEvents()
+void NeuroEvolutionTraining::HandleGameEvents()
 {
-    while ( SDL_PollEvent( &_event ) )
-    {
-        if ( _event.type == SDL_QUIT ) { _running = false; }
-        else if ( _event.type == SDL_KEYDOWN &&  _event.key.keysym.sym == SDLK_ESCAPE ) { _running = false; }
-    }
+    // Logic handled in base class, GameLoop::HandleEvents
+    return;
 }
 
 void NeuroEvolutionTraining::UpdateAll()
@@ -66,6 +64,7 @@ void NeuroEvolutionTraining::UpdateAll()
     }
     if ( _paddles.size() == 0 )
     {
+        _generations.Increment();
         for ( auto i = 0; i < _numberOfPaddles; ++i ) { PushPaddlesBallsAndColors(); }
     }
 }
@@ -126,4 +125,9 @@ void NeuroEvolutionTraining::PushPaddlesBallsAndColors()
         )
     );
     _colors.emplace_back ( Rgba( rand() % 256, rand() % 256, rand() % 256, 0x00 ) );
+}
+
+PaddleBrain NeuroEvolutionTraining::GetPaddleBrain()
+{
+    return _brains[0];
 }

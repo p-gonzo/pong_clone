@@ -14,7 +14,7 @@ public:
 
 protected:
 
-virtual void HandleEvents();
+virtual void HandleGameEvents();
 virtual void UpdateAll();
 virtual void DrawAll();
 

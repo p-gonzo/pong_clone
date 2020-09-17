@@ -11,6 +11,15 @@ PlayerScore::PlayerScore( Vec2 pos, SDL_Renderer *rndr, TTF_Font *fnt )
     
 }
 
+PlayerScore::PlayerScore( Vec2 pos, SDL_Renderer *rndr, TTF_Font *fnt, const std::string &prefix )
+    : renderer( rndr ), font ( fnt ), _prefix ( prefix )
+{
+    SetTextures();
+    rect.x = static_cast<int>( pos.x );
+    rect.y = static_cast<int>( pos.y );
+    
+}
+
 PlayerScore::~PlayerScore()
 {
     CleanUpTextures();
@@ -24,7 +33,7 @@ void PlayerScore::Draw( const Rgba &color )
 
 void PlayerScore::Increment()
 {
-    SetScore( value + 1);
+    SetScore( value + 1 );
 }
 
 void PlayerScore::Clear()
@@ -41,7 +50,8 @@ void PlayerScore::SetScore( int newScore )
 
 void PlayerScore::SetTextures()
 {
-    surface = TTF_RenderText_Solid( font, std::to_string(value).c_str(), { 0xFF, 0xFF, 0xFF, 0xFF });
+    auto text = _prefix + " " + std::to_string(value);
+    surface = TTF_RenderText_Solid( font, text.c_str(), { 0xFF, 0xFF, 0xFF, 0xFF });
     texture = SDL_CreateTextureFromSurface( renderer, surface );
 
     int width;

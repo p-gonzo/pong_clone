@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
@@ -10,6 +12,7 @@ class PlayerScore
 {
 public:
     PlayerScore( Vec2 position, SDL_Renderer* renderer, TTF_Font* font );
+    PlayerScore( Vec2 position, SDL_Renderer* renderer, TTF_Font* font, const std::string &prefix );
 
     ~PlayerScore();
     void Draw( const Rgba &color );
@@ -27,5 +30,7 @@ private:
     void SetScore( int newScore );
     void SetTextures();
     void CleanUpTextures();
+
+    std::string _prefix;
 
 };

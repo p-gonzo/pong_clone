@@ -17,9 +17,11 @@ class NeuroEvolutionTraining final: public GameLoop
 public:
     NeuroEvolutionTraining();
 
+    PaddleBrain GetPaddleBrain();
+
 protected:
 
-virtual void HandleEvents();
+virtual void HandleGameEvents();
 virtual void UpdateAll();
 virtual void DrawAll();
 

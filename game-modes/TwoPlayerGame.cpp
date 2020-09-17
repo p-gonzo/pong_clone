@@ -33,27 +33,21 @@ TwoPlayerGame::TwoPlayerGame()
 
 }
 
-void TwoPlayerGame::HandleEvents()
+void TwoPlayerGame::HandleGameEvents()
 {
-    while ( SDL_PollEvent( &_event ) )
+    if ( _event.type == SDL_KEYDOWN )
     {
-        std::cout << _event.key.keysym.sym << std::endl;
-        if ( _event.type == SDL_QUIT ) _running = false;
-        else if ( _event.type == SDL_KEYDOWN )
-        {
-            if ( _event.key.keysym.sym == SDLK_ESCAPE ) _running = false;
-            else if ( _event.key.keysym.sym == SDLK_w ) { _playerButtonStates[Buttons::p1PaddleUp] = true; }
-            else if ( _event.key.keysym.sym == SDLK_s ) { _playerButtonStates[Buttons::p1PaddleDown] = true; }
-            else if ( _event.key.keysym.sym == SDLK_UP ) { _playerButtonStates[Buttons::p2PaddleUp] = true; }
-            else if ( _event.key.keysym.sym == SDLK_DOWN ) { _playerButtonStates[Buttons::p2PaddleDown] = true; }
-        }
-        else if ( _event.type == SDL_KEYUP )
-        {
-            if ( _event.key.keysym.sym == SDLK_w ) { _playerButtonStates[Buttons::p1PaddleUp] = false; }
-            else if ( _event.key.keysym.sym == SDLK_s ) { _playerButtonStates[Buttons::p1PaddleDown] = false; }
-            else if ( _event.key.keysym.sym == SDLK_UP ) { _playerButtonStates[Buttons::p2PaddleUp] = false; }
-            else if ( _event.key.keysym.sym == SDLK_DOWN ) { _playerButtonStates[Buttons::p2PaddleDown] = false; }
-        }
+        if ( _event.key.keysym.sym == SDLK_w ) { _playerButtonStates[Buttons::p1PaddleUp] = true; }
+        else if ( _event.key.keysym.sym == SDLK_s ) { _playerButtonStates[Buttons::p1PaddleDown] = true; }
+        else if ( _event.key.keysym.sym == SDLK_UP ) { _playerButtonStates[Buttons::p2PaddleUp] = true; }
+        else if ( _event.key.keysym.sym == SDLK_DOWN ) { _playerButtonStates[Buttons::p2PaddleDown] = true; }
+    }
+    else if ( _event.type == SDL_KEYUP )
+    {
+        if ( _event.key.keysym.sym == SDLK_w ) { _playerButtonStates[Buttons::p1PaddleUp] = false; }
+        else if ( _event.key.keysym.sym == SDLK_s ) { _playerButtonStates[Buttons::p1PaddleDown] = false; }
+        else if ( _event.key.keysym.sym == SDLK_UP ) { _playerButtonStates[Buttons::p2PaddleUp] = false; }
+        else if ( _event.key.keysym.sym == SDLK_DOWN ) { _playerButtonStates[Buttons::p2PaddleDown] = false; }
     }
 }
 
