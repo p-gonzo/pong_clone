@@ -30,8 +30,10 @@ NeuroEvolutionTraining::NeuroEvolutionTraining()
 
 void NeuroEvolutionTraining::HandleGameEvents()
 {
-    // Logic handled in base class, GameLoop::HandleEvents
-    return;
+    if ( _event.type == SDL_KEYDOWN &&  _event.key.keysym.sym == SDLK_r)
+    {
+        RestartTraining();
+    }
 }
 
 void NeuroEvolutionTraining::UpdateAll()
@@ -111,7 +113,7 @@ void NeuroEvolutionTraining::CloneAndMutatePaddleBrain()
 {
     for ( auto i = 0; i < Constants::TrainingPaddles; ++i )
     {
-        _brains.emplace_back( PaddleBrain( _brains[0], _randomSeed, 0.1f, 0.25f ) );
+        _brains.emplace_back( PaddleBrain( _brains[0], _randomSeed, 0.2f, 0.35f ) );
     }
 }
 
@@ -135,6 +137,21 @@ void NeuroEvolutionTraining::PushPaddlesBallsAndColors()
         )
     );
     _colors.emplace_back ( Rgba( rand() % 256, rand() % 256, rand() % 256, 0x00 ) );
+}
+
+void NeuroEvolutionTraining::RestartTraining()
+{
+        _balls.clear();
+        _paddles.clear();
+        _brains.clear();
+        _colors.clear();
+        for ( int i = 0; i < _numberOfPaddles; ++i )
+        {
+            PushPaddlesBallsAndColors();
+            _brains.emplace_back( PaddleBrain( _randomSeed ) );
+        }
+        _generations.Clear();
+        _hits.Clear();
 }
 
 PaddleBrain NeuroEvolutionTraining::GetPaddleBrain()

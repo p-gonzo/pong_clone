@@ -88,7 +88,7 @@ void Ball::HandlePaddleCollision( const Paddle &paddle, const float left, const 
 
         // Generate a random bounce for training
         bool isWall = paddleBottom - paddleTop == Constants::WindowHeight;
-        float ballPaddleYDelta =  isWall ? ( rand() % ( Constants::PaddleHeight * 2 ) ) - Constants::PaddleHeight : ballYCenter - paddleYCenter;
+        float ballPaddleYDelta =  isWall ? ( rand() %  20 ) - 10 : ballYCenter - paddleYCenter;
 
         velocity.y = ( ballPaddleYDelta / ( 1 + ballPaddleYDelta ) ) * ( ballPaddleYDelta > 0 ? 1 : -1 );
         velocity.y *= Constants::BallXDeltaScalar;

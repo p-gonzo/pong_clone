@@ -42,4 +42,5 @@ private:
     float Transpose( float value, float leftMin, float leftMax, float rightMin, float rightMax ) const;
     void CloneAndMutatePaddleBrain();
     void PushPaddlesBallsAndColors();
+    void RestartTraining();
 };
